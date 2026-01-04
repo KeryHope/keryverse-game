@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KERYVERSE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fff5f7 0%, #e6f7ff 100%);
+            color: #333;
+            position: fixed;
+        }
+
+        /* Mobile Only Check */
+        .desktop-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff66cc 0%, #66ccff 100%);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        @media (min-width: 769px) {
+            .desktop-warning {
+                display: flex;
+            }
+            
+            .mobile-app {
+                display: none;
+            }
+        }
+
+        .mobile-app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Status Bar (iOS style) */
+        .status-bar {
+            height: 44px;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 100;
+        }
+
+        .time {
+            font-weight: 700;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #ff66cc 0%, #66ccff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 20px;
+            margin: 0 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff66cc, #66ccff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        /* Character Section */
+        .character-section {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff66cc, #66ccff);
+        }
+
+        .character-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Mobile Doll */
+        .mobile-doll {
+            position: relative;
+            width: 200px;
+            height: 280px;
+            margin: 0 auto;
+        }
+
+        .doll-hair {
+            position: absolute;
+            width: 160px;
+            height: 100px;
+            background: linear-gradient(135deg, #ffd700, #ffcc66, #fffacd);
+            border-radius: 50% 50% 40% 40%;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .doll-face {
+            position: absolute;
+            width: 100px;
+            height: 120px;
+            background: linear-gradient(135deg, #fffacd, #fff8dc);
+            border-radius: 45% 45% 50% 50%;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.1),
+                inset 0 5px 10px rgba(255,255,255,0.9);
+        }
+
+        .doll-eyes {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            z-index: 3;
+        }
+
+        .eye {
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(135deg, #87ceeb, #66ccff);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eye::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #1e90ff;
+            border-radius: 50%;
+            top: 9px;
+            left: 4px;
+            animation: blink 4s infinite;
+        }
+
+        .doll-mouth {
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            background: #ff66cc;
+            border-radius: 0 0 15px 15px;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            animation: smile 5s infinite;
+        }
+
+        .doll-body {
+            position: absolute;
+            width: 100px;
+            height: 140px;
+            background: linear-gradient(135deg, #ffccff, #ff99cc);
+            border-radius: 40% 40% 30% 30%;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 0 10px 25px rgba(255, 102, 204, 0.3);
+        }
+
+        .doll-dress {
+            position: absolute;
+            width: 120px;
+            height: 100px;
+            background: linear-gradient(135deg, #66ccff, #87ceeb, #ccffff);
+            border-radius: 40% 40% 20% 20%;
+            top: 170px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+            box-shadow: 0 10px 25px rgba(102, 204, 255, 0.3);
+        }
+
+        /* Doll Info */
+        .doll-info {
+            text-align: center;
+            width: 100%;
+        }
+
+        .doll-name {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff66cc, #66ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .doll-title {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .mood-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 102, 204, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+        }
+
+        .mood-emoji {
+            font-size: 1.8rem;
+            animation: bounce 2s infinite;
+        }
+
+        .mood-text {
+            font-weight: 600;
+            color: #ff66cc;
+        }
+
+        .doll-dialogue {
+            background: rgba(102, 204, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 3px solid #66ccff;
+            font-style: italic;
+            color: #666;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 102, 204, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon-small {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ff66cc, #66ccff);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .stat-name {
+            font-size: 0.9rem;
+            color: #666;
+            flex: 1;
+        }
+
+        .stat-value-card {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .health-bar .progress-fill { background: linear-gradient(90deg, #ff66cc, #ff99cc); }
+        .mood-bar .progress-fill { background: linear-gradient(90deg, #66ccff, #87ceeb); }
+        .energy-bar .progress-fill { background: linear-gradient(90deg, #ffcc66, #ffd700); }
+        .xp-bar .progress-fill { background: linear-gradient(90deg, #cc66ff, #9966cc); }
+
+        /* Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .action-btn i {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff66cc, #66ccff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .action-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .action-cost {
+            font-size: 0.8rem;
+            color: #ff9966;
+            font-weight: 600;
+        }
+
+        /* Shop Items */
+        .shop-section {
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #ff66cc;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: rgba(255, 102, 204, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 102, 204, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .shop-item:active {
+            transform: scale(0.98);
+            background: rgba(255, 102, 204, 0.1);
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff66cc, #66ccff);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #ff9966;
+            font-size: 1.1rem;
+        }
+
+        .item-desc {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .item-effects {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .effect-tag {
+            background: rgba(102, 204, 255, 0.1);
+            color: #66ccff;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 10px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #999;
+            transition: all 0.2s ease;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .nav-item.active {
+            color: #ff66cc;
+            background: rgba(255, 102, 204, 0.1);
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            border-left: 4px solid #ff66cc;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .notification-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ff66cc, #66ccff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+        }
+
+        .notification-message {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff66cc 0%, #66ccff 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 30px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        @keyframes smile {
+            0%, 80%, 100% { height: 15px; }
+            85%, 95% { height: 10px; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .main-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .main-content {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Swipe indicators */
+        .swipe-hint {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #999;
+            font-size: 0.8rem;
+            animation: fadeInOut 2s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Telegram Button */
+        .telegram-btn {
+            background: linear-gradient(135deg, #0088cc, #00aced);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 20px auto;
+            width: calc(100% - 40px);
+            box-shadow: 0 5px 20px rgba(0, 136, 204, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .telegram-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Responsive adjustments */
+        @media (max-height: 700px) {
+            .mobile-doll {
+                width: 160px;
+                height: 220px;
+            }
+            
+            .doll-hair {
+                width: 130px;
+                height: 80px;
+                top: 30px;
+            }
+            
+            .doll-face {
+                width: 80px;
+                height: 95px;
+                top: 65px;
+            }
+            
+            .doll-body {
+                width: 80px;
+                height: 110px;
+                top: 130px;
+            }
+            
+            .doll-dress {
+                width: 95px;
+                height: 80px;
+                top: 135px;
+            }
+            
+            .doll-name {
+                font-size: 1.7rem;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .stats-cards, .actions-grid, .shop-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop Warning -->
+    <div class="desktop-warning">
+        <div style="font-size: 3rem; margin-bottom: 20px;">📱</div>
+        <h1 style="font-size: 2rem; margin-bottom: 20px;">KERYVERSE</h1>
+        <p style="font-size: 1.2rem; max-width: 500px; line-height: 1.5;">
+            Эта версия игры разработана специально для мобильных устройств.
+            <br><br>
+            Пожалуйста, откройте игру на вашем смартфоне или планшете для наилучшего опыта.
+        </p>
+    </div>
+
+    <!-- Mobile App -->
+    <div class="mobile-app">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time" id="currentTime">14:30</div>
+            <div class="status-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-logo">KERYVERSE</div>
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification">
+            <div class="notification-header">
+                <div class="notification-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="notification-title">Добро пожаловать!</div>
+            </div>
+            <div class="notification-message">Керри рада видеть вас!</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent" style="display: none;">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">KERYVERSE</div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-value" id="coinsStat">1,250</div>
+                    <div class="stat-label">Coins</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <div class="stat-value" id="gemsStat">25</div>
+                    <div class="stat-label">Gems</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-value" id="levelStat">12</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <!-- Character Section -->
+            <div class="character-section">
+                <div class="character-container">
+                    <div class="mobile-doll">
+                        <div class="doll-hair"></div>
+                        <div class="doll-face">
+                            <div class="doll-eyes">
+                                <div class="eye left"></div>
+                                <div class="eye right"></div>
+                            </div>
+                            <div class="doll-mouth"></div>
+                        </div>
+                        <div class="doll-dress"></div>
+                        <div class="doll-body"></div>
+                    </div>
+                    
+                    <div class="doll-info">
+                        <div class="doll-name">Kerry</div>
+                        <div class="doll-title">Blonde Doll • Level 12</div>
+                        
+                        <div class="mood-display">
+                            <div class="mood-emoji" id="moodEmoji">💖</div>
+                            <div class="mood-text" id="moodText">Happy</div>
+                        </div>
+                        
+                        <div class="doll-dialogue" id="dialogueText">
+                            Привет! Я Керри, твоя куколка. Давай проведём день вместе!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon-small">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-name">Health</div>
+                    </div>
+                    <div class="stat-value-card" id="healthValue">85%</div>
+                    <div class="progress-bar health-bar">
+                        <div class="progress-fill" id="healthBar" style="width: 85%;"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon-small">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <div class="stat-name">Mood</div>
+                    </div>
+                    <div class="stat-value-card" id="moodValue">92%</div>
+                    <div class="progress-bar mood-bar">
+                        <div class="progress-fill" id="moodBar" style="width: 92%;"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon-small">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="stat-name">Energy</div>
+                    </div>
+                    <div class="stat-value-card" id="energyValue">78%</div>
+                    <div class="progress-bar energy-bar">
+                        <div class="progress-fill" id="energyBar" style="width: 78%;"></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon-small">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-name">Experience</div>
+                    </div>
+                    <div class="stat-value-card" id="xpValue">750/1000</div>
+                    <div class="progress-bar xp-bar">
+                        <div class="progress-fill" id="xpBar" style="width: 75%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Grid -->
+            <div class="section-title">
+                <i class="fas fa-magic"></i>
+                Actions
+            </div>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="performAction('feed')">
+                    <i class="fas fa-cookie-bite"></i>
+                    <div class="action-name">Feed</div>
+                    <div class="action-cost">-15 Coins</div>
+                </button>
+                
+                <button class="action-btn" onclick="performAction('play')">
+                    <i class="fas fa-gamepad"></i>
+                    <div class="action-name">Play</div>
+                    <div class="action-cost">-5 Energy</div>
+                </button>
+                
+                <button class="action-btn" onclick="performAction('beauty')">
+                    <i class="fas fa-spa"></i>
+                    <div class="action-name">Beauty</div>
+                    <div class="action-cost">-25 Coins</div>
+                </button>
+                
+                <button class="action-btn" onclick="performAction('study')">
+                    <i class="fas fa-book"></i>
+                    <div class="action-name">Study</div>
+                    <div class="action-cost">-10 Energy</div>
+                </button>
+                
+                <button class="action-btn" onclick="performAction('rest')">
+                    <i class="fas fa-bed"></i>
+                    <div class="action-name">Rest</div>
+                    <div class="action-cost">FREE</div>
+                </button>
+                
+                <button class="action-btn" onclick="performAction('hug')">
+                    <i class="fas fa-heart"></i>
+                    <div class="action-name">Hug</div>
+                    <div class="action-cost">FREE</div>
+                </button>
+            </div>
+
+            <!-- Shop Section -->
+            <div class="shop-section">
+                <div class="section-title">
+                    <i class="fas fa-shopping-bag"></i>
+                    Shop
+                </div>
+                <div class="shop-items">
+                    <div class="shop-item" onclick="buyItem('dress')">
+                        <div class="item-header">
+                            <div class="item-icon">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <div class="item-name">Pink Dress</div>
+                            <div class="item-price">120</div>
+                        </div>
+                        <div class="item-desc">Beautiful pink dress for Kerry</div>
+                        <div class="item-effects">
+                            <span class="effect-tag">
+                                <i class="fas fa-smile"></i> +15 Mood
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="shop-item" onclick="buyItem('hair')">
+                        <div class="item-header">
+                            <div class="item-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="item-name">Hair Accessory</div>
+                            <div class="item-price">80</div>
+                        </div>
+                        <div class="item-desc">Sparkling hair accessory</div>
+                        <div class="item-effects">
+                            <span class="effect-tag">
+                                <i class="fas fa-heart"></i> +10 Health
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="shop-item" onclick="buyItem('guide')">
+                        <div class="item-header">
+                            <div class="item-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="item-name">Beauty Guide</div>
+                            <div class="item-price">2 <i class="fas fa-gem"></i></div>
+                        </div>
+                        <div class="item-desc">Premium beauty techniques</div>
+                        <div class="item-effects">
+                            <span class="effect-tag">
+                                <i class="fas fa-star"></i> +50 XP
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="shop-item" onclick="buyItem('perfume')">
+                        <div class="item-header">
+                            <div class="item-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <div class="item-name">Perfume</div>
+                            <div class="item-price">150</div>
+                        </div>
+                        <div class="item-desc">Lovely floral perfume</div>
+                        <div class="item-effects">
+                            <span class="effect-tag">
+                                <i class="fas fa-smile"></i> +20 Mood
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telegram Button -->
+            <button class="telegram-btn" onclick="connectTelegram()">
+                <i class="fab fa-telegram"></i>
+                Connect Telegram for Rewards
+            </button>
+
+            <!-- Swipe Hint -->
+            <div class="swipe-hint">
+                <i class="fas fa-chevron-up"></i> Swipe up for more
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="switchTab('home')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('shop')">
+                <div class="nav-icon">🛍️</div>
+                <div class="nav-label">Shop</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('quests')">
+                <div class="nav-icon">🎯</div>
+                <div class="nav-label">Quests</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('profile')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            coins: 1250,
+            gems: 25,
+            level: 12,
+            health: 85,
+            mood: 92,
+            energy: 78,
+            xp: 750,
+            xpNeeded: 1000,
+            dollMood: 'happy'
+        };
+
+        // Dialogues
+        const dialogues = [
+            "Привет! Я Керри, твоя куколка. Давай проведём день вместе! 💖",
+            "Сегодня отличный день для ухода за собой! ✨",
+            "Спасибо, что заботишься обо мне! Я так счастлива! 😊",
+            "Хочешь поиграть? У меня есть идеи для весёлых игр! 🎮",
+            "Красота требует ухода, но это так приятно! 💅",
+            "Я обожаю новые платья и аксессуары! 🛍️",
+            "Обнимашки делают день лучше! Давай обнимемся! 🤗"
+        ];
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update time
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // Load game
+            loadGame();
+            
+            // Hide loading screen after 1.5 seconds
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    showNotification('Добро пожаловать в KERYVERSE!', 'Ваша куколка Керри ждёт заботы!');
+                    updateDialogue();
+                }, 500);
+            }, 1500);
+            
+            // Touch feedback for buttons
+            document.querySelectorAll('.action-btn, .shop-item, .nav-item').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.8';
+                });
+                
+                btn.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+            
+            // Doll touch interaction
+            document.querySelector('.mobile-doll').addEventListener('click', function() {
+                const reactions = [
+                    "Ой, щекотно! 😄",
+                    "Мне нравятся твои прикосновения! 💕",
+                    "Ты делаешь меня счастливой! ✨",
+                    "Давай обнимемся! 🤗",
+                    "Ты лучший хозяин! 🥰"
+                ];
+                
+                updateDialogue(reactions[Math.floor(Math.random() * reactions.length)]);
+                increaseMood(3);
+                createTouchEffect();
+            });
+            
+            // Auto decrease stats
+            setInterval(() => {
+                if (gameState.health > 20) gameState.health -= 0.2;
+                if (gameState.mood > 20) gameState.mood -= 0.3;
+                if (gameState.energy > 20) gameState.energy -= 0.4;
+                
+                updateUI();
+                updateMoodDisplay();
+                saveGame();
+            }, 60000);
+        });
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('coinsStat').textContent = gameState.coins.toLocaleString();
+            document.getElementById('gemsStat').textContent = gameState.gems;
+            document.getElementById('levelStat').textContent = gameState.level;
+            document.getElementById('healthValue').textContent = `${Math.round(gameState.health)}%`;
+            document.getElementById('moodValue').textContent = `${Math.round(gameState.mood)}%`;
+            document.getElementById('energyValue').textContent = `${Math.round(gameState.energy)}%`;
+            document.getElementById('xpValue').textContent = `${Math.round(gameState.xp)}/${gameState.xpNeeded}`;
+            
+            // Update progress bars
+            document.getElementById('healthBar').style.width = `${gameState.health}%`;
+            document.getElementById('moodBar').style.width = `${gameState.mood}%`;
+            document.getElementById('energyBar').style.width = `${gameState.energy}%`;
+            document.getElementById('xpBar').style.width = `${(gameState.xp / gameState.xpNeeded) * 100}%`;
+        }
+
+        // Update mood display
+        function updateMoodDisplay() {
+            const moodEmoji = document.getElementById('moodEmoji');
+            const moodText = document.getElementById('moodText');
+            const mouth = document.querySelector('.doll-mouth');
+            
+            if (gameState.mood >= 90) {
+                moodEmoji.textContent = '💖';
+                moodText.textContent = 'Ecstatic';
+                mouth.style.background = '#ff66cc';
+                gameState.dollMood = 'ecstatic';
+            } else if (gameState.mood >= 70) {
+                moodEmoji.textContent = '😊';
+                moodText.textContent = 'Happy';
+                mouth.style.background = '#ff99cc';
+                gameState.dollMood = 'happy';
+            } else if (gameState.mood >= 50) {
+                moodEmoji.textContent = '🙂';
+                moodText.textContent = 'Good';
+                mouth.style.background = '#ffcccc';
+                gameState.dollMood = 'good';
+            } else if (gameState.mood >= 30) {
+                moodEmoji.textContent = '😐';
+                moodText.textContent = 'Okay';
+                mouth.style.background = '#ccccff';
+                gameState.dollMood = 'okay';
+            } else {
+                moodEmoji.textContent = '😔';
+                moodText.textContent = 'Sad';
+                mouth.style.background = '#9999ff';
+                mouth.style.borderRadius = '15px 15px 0 0';
+                mouth.style.transform = 'translateX(-50%) rotate(180deg)';
+                gameState.dollMood = 'sad';
+            }
+        }
+
+        // Update dialogue
+        function updateDialogue(customText) {
+            const dialogue = document.getElementById('dialogueText');
+            dialogue.style.opacity = '0';
+            
+            setTimeout(() => {
+                dialogue.textContent = customText || dialogues[Math.floor(Math.random() * dialogues.length)];
+                dialogue.style.opacity = '1';
+            }, 200);
+        }
+
+        // Perform action
+        function performAction(action) {
+            switch(action) {
+                case 'feed':
+                    if (gameState.coins >= 15) {
+                        gameState.coins -= 15;
+                        gameState.health = Math.min(100, gameState.health + 10);
+                        gameState.mood = Math.min(100, gameState.mood + 8);
+                        gameState.xp += 20;
+                        showNotification('Керри покормлена!', '+10 Health, +8 Mood');
+                        updateDialogue("Вкусно! Спасибо за еду! 🍰");
+                    } else {
+                        showNotification('Недостаточно монет!', 'Нужно 15 монет', 'error');
+                    }
+                    break;
+                    
+                case 'play':
+                    if (gameState.energy >= 5) {
+                        gameState.energy -= 5;
+                        gameState.mood = Math.min(100, gameState.mood + 15);
+                        gameState.xp += 25;
+                        showNotification('Весело поиграли!', '+15 Mood, -5 Energy');
+                        updateDialogue("Было так весело! Давай ещё! 🎮");
+                    } else {
+                        showNotification('Мало энергии!', 'Керри устала', 'warning');
+                    }
+                    break;
+                    
+                case 'beauty':
+                    if (gameState.coins >= 25) {
+                        gameState.coins -= 25;
+                        gameState.mood = Math.min(100, gameState.mood + 20);
+                        gameState.xp += 35;
+                        showNotification('Уход завершён!', '+20 Mood');
+                        updateDialogue("Я чувствую себя прекрасно! 💅");
+                    } else {
+                        showNotification('Недостаточно монет!', 'Нужно 25 монет', 'error');
+                    }
+                    break;
+                    
+                case 'study':
+                    if (gameState.energy >= 10) {
+                        gameState.energy -= 10;
+                        gameState.xp += 40;
+                        showNotification('Урок завершён!', '+40 XP, -10 Energy');
+                        updateDialogue("Я узнала много нового! 📚");
+                    } else {
+                        showNotification('Мало энергии!', 'Нужно отдохнуть', 'warning');
+                    }
+                    break;
+                    
+                case 'rest':
+                    gameState.energy = Math.min(100, gameState.energy + 25);
+                    gameState.health = Math.min(100, gameState.health + 5);
+                    showNotification('Керри отдохнула!', '+25 Energy, +5 Health');
+                    updateDialogue("Я выспалась и полна сил! 💤");
+                    break;
+                    
+                case 'hug':
+                    increaseMood(10);
+                    showNotification('Обнимашки!', '+10 Mood');
+                    updateDialogue("Обнимашки самые лучшие! 🤗");
+                    break;
+            }
+            
+            checkLevelUp();
+            updateUI();
+            updateMoodDisplay();
+            saveGame();
+            createActionEffect();
+        }
+
+        // Buy item
+        function buyItem(item) {
+            const prices = {
+                'dress': 120,
+                'hair': 80,
+                'guide': { gems: 2 },
+                'perfume': 150
+            };
+            
+            if (item === 'guide') {
+                if (gameState.gems >= 2) {
+                    gameState.gems -= 2;
+                    gameState.xp += 50;
+                    showNotification('Гайд куплен!', '+50 XP');
+                    updateDialogue("Спасибо за полезный гайд! 📖");
+                } else {
+                    showNotification('Недостаточно алмазов!', 'Нужно 2 алмаза', 'error');
+                }
+            } else {
+                const price = prices[item];
+                if (gameState.coins >= price) {
+                    gameState.coins -= price;
+                    gameState.mood = Math.min(100, gameState.mood + 15);
+                    gameState.xp += 30;
+                    showNotification('Покупка совершена!', '+15 Mood');
+                    updateDialogue("Спасибо за подарок! Я обожаю его! 🎁");
+                } else {
+                    showNotification('Недостаточно монет!', `Нужно ${price} монет`, 'error');
+                }
+            }
+            
+            updateUI();
+            saveGame();
+            createPurchaseEffect();
+        }
+
+        // Increase mood
+        function increaseMood(amount) {
+            gameState.mood = Math.min(100, gameState.mood + amount);
+            updateMoodDisplay();
+            updateUI();
+        }
+
+        // Check level up
+        function checkLevelUp() {
+            if (gameState.xp >= gameState.xpNeeded) {
+                gameState.level++;
+                gameState.xp -= gameState.xpNeeded;
+                gameState.xpNeeded = Math.floor(gameState.xpNeeded * 1.2);
+                gameState.coins += gameState.level * 50;
+                gameState.gems += 1;
+                
+                showNotification('Уровень повышен!', `Теперь уровень ${gameState.level}!`);
+                updateDialogue(`Ура! Я достигла ${gameState.level} уровня! 🎉`);
+                createLevelUpEffect();
+            }
+        }
+
+        // Connect Telegram
+        function connectTelegram() {
+            gameState.coins += 100;
+            gameState.gems += 2;
+            showNotification('Telegram подключён!', '+100 Coins, +2 Gems');
+            updateDialogue("Теперь мы можем общаться в Telegram! 📱");
+            updateUI();
+            saveGame();
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Simple tab switching - in full version would load different content
+            showNotification(`${tab.charAt(0).toUpperCase() + tab.slice(1)}`, 'Функция в разработке');
+        }
+
+        // Show notification
+        function showNotification(title, message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = notification.querySelector('.notification-icon i');
+            const titleEl = notification.querySelector('.notification-title');
+            const messageEl = notification.querySelector('.notification-message');
+            
+            // Set icon based on type
+            switch(type) {
+                case 'success':
+                    icon.className = 'fas fa-check';
+                    notification.style.borderLeftColor = '#4cd964';
+                    break;
+                case 'error':
+                    icon.className = 'fas fa-times';
+                    notification.style.borderLeftColor = '#ff3b30';
+                    break;
+                case 'warning':
+                    icon.className = 'fas fa-exclamation';
+                    notification.style.borderLeftColor = '#ffcc00';
+                    break;
+            }
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Create effects
+        function createTouchEffect() {
+            const doll = document.querySelector('.mobile-doll');
+            const hearts = ['💖', '💕', '💗'];
+            
+            for (let i = 0; i < 3; i++) {
+                const heart = document.createElement('div');
+                heart.textContent = hearts[i];
+                heart.style.position = 'absolute';
+                heart.style.fontSize = '20px';
+                heart.style.left = '50%';
+                heart.style.top = '40%';
+                heart.style.transform = 'translate(-50%, -50%)';
+                heart.style.opacity = '0';
+                heart.style.animation = `floatUp 1s ease-out ${i * 0.2}s forwards`;
+                
+                doll.appendChild(heart);
+                setTimeout(() => heart.remove(), 1000);
+            }
+            
+            // Add floatUp animation
+            if (!document.querySelector('#floatUp')) {
+                const style = document.createElement('style');
+                style.id = 'floatUp';
+                style.textContent = `
+                    @keyframes floatUp {
+                        0% { transform: translate(-50%, -50%); opacity: 1; }
+                        100% { transform: translate(-50%, -150%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        function createActionEffect() {
+            const btn = event.currentTarget;
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 200);
+        }
+
+        function createPurchaseEffect() {
+            const item = event.currentTarget;
+            item.style.background = 'rgba(102, 204, 255, 0.2)';
+            setTimeout(() => {
+                item.style.background = '';
+            }, 300);
+        }
+
+        function createLevelUpEffect() {
+            // Add sparkle effect
+            const sparkles = ['✨', '🌟', '⭐'];
+            const container = document.querySelector('.character-section');
+            
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                    sparkle.style.position = 'absolute';
+                    sparkle.style.fontSize = '25px';
+                    sparkle.style.left = `${Math.random() * 100}%`;
+                    sparkle.style.top = `${Math.random() * 100}%`;
+                    sparkle.style.opacity = '0.8';
+                    sparkle.style.animation = 'bounce 0.5s ease-in-out';
+                    
+                    container.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 500);
+                }, i * 100);
+            }
+        }
+
+        // Save/load game
+        function saveGame() {
+            localStorage.setItem('keryverse_mobile_save', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('keryverse_mobile_save');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                Object.assign(gameState, loaded);
+                updateUI();
+                updateMoodDisplay();
+            }
+        }
+
+        // Prevent pull-to-refresh on mobile
+        let touchStartY = 0;
+        document.addEventListener('touchstart', e => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', e => {
+            const touchY = e.touches[0].clientY;
+            const scrolledToTop = document.querySelector('.main-content').scrollTop === 0;
+            const isPullDown = touchY > touchStartY;
+            
+            if (scrolledToTop && isPullDown) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Handle back button on Android
+        let backButtonPressed = false;
+        document.addEventListener('touchstart', () => {
+            backButtonPressed = false;
+        });
+
+        // Prevent zoom with double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
