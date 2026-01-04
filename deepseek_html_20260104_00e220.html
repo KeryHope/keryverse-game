@@ -1,0 +1,2794 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carivers - Игра про девочку Кэри</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ffafcc;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #ff5d8f;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .daily-bonus {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .bonus-btn {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .bonus-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(243, 104, 224, 0.3);
+        }
+
+        .bonus-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #bonusTimer {
+            background: rgba(0,0,0,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stats-panel, .main-panel, .rewards-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h2, h3 {
+            color: #ff5d8f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i, h3 i {
+            color: #ffafcc;
+        }
+
+        .stat-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #555;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #ff5d8f;
+            margin-right: 10px;
+        }
+
+        .level-bar, .health-bar, .mood-bar, .energy-bar {
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .level-fill {
+            background: linear-gradient(90deg, #ffafcc, #ff5d8f);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .health-fill {
+            background: linear-gradient(90deg, #90e0ef, #00b4d8);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .mood-fill {
+            background: linear-gradient(90deg, #ffd166, #ff9e00);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .energy-fill {
+            background: linear-gradient(90deg, #c8e7a1, #83c167);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .coin-icon {
+            color: #ffd166;
+            margin-left: 5px;
+        }
+
+        .gem-icon {
+            color: #a2d2ff;
+            margin-left: 5px;
+        }
+
+        .telegram-box {
+            background: linear-gradient(135deg, #0088cc, #1e96e8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .telegram-box h3 {
+            color: white;
+        }
+
+        .tg-btn {
+            background: white;
+            color: #0088cc;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .tg-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tg-status {
+            margin: 15px 0;
+        }
+
+        .status-connected, .status-disconnected {
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .status-connected {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            border: 2px solid #27ae60;
+        }
+
+        .status-disconnected {
+            background: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            border: 2px solid #c0392b;
+        }
+
+        .tg-features {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .tg-features p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        /* CHARACTER DRAWING */
+        .character-container {
+            position: relative;
+            width: 250px;
+            height: 350px;
+            margin: 0 auto;
+        }
+
+        .character {
+            position: relative;
+            width: 150px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .character-face {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 120px;
+            background: linear-gradient(135deg, #ffdbac, #f1c27d);
+            border-radius: 50% 50% 40% 40%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .character-hair {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border-radius: 60% 60% 40% 40%;
+            z-index: 5;
+        }
+
+        .character-hair::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 10px;
+            width: 100px;
+            height: 40px;
+            background: inherit;
+            border-radius: 30% 30% 0 0;
+        }
+
+        .eyes {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .eye {
+            width: 20px;
+            height: 25px;
+            background: white;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            background: #2c3e50;
+            border-radius: 50%;
+        }
+
+        .mouth {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            background: #ff6b81;
+            border-radius: 0 0 20px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .mouth.happy {
+            height: 15px;
+            border-radius: 0 0 20px 20px;
+            background: #ff4757;
+        }
+
+        .mouth.sad {
+            height: 25px;
+            border-radius: 20px 20px 0 0;
+            background: #3742fa;
+            transform: translateX(-50%) rotate(180deg);
+        }
+
+        .mouth.neutral {
+            height: 5px;
+            width: 30px;
+            border-radius: 5px;
+            background: #ff6b81;
+        }
+
+        .character-dress {
+            position: absolute;
+            top: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 150px;
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+            border-radius: 50% 50% 10% 10%;
+            z-index: 8;
+        }
+
+        .character-accessories {
+            position: absolute;
+            z-index: 20;
+            width: 150px;
+            height: 300px;
+        }
+
+        .accessory {
+            position: absolute;
+            font-size: 24px;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        .character-mood {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #ff5d8f;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions {
+            margin-top: 30px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #a2d2ff, #cdb4db);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            flex-direction: column;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-cost {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .quick-actions {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .quick-actions h4 {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .quick-btns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .quick-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .quick-btn:hover {
+            background: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+        /* SHOP STYLES */
+        .shop-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: #ff5d8f;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .shop-items {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .shop-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .shop-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .shop-item.premium {
+            background: linear-gradient(135deg, #fff5f7, #fff0f3);
+            border: 2px dashed #ffafcc;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            display: block;
+        }
+
+        .item-desc {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
+        }
+
+        .price {
+            font-weight: 700;
+            color: #ff5d8f;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* REWARDS AND QUESTS */
+        .daily-quests {
+            margin-bottom: 30px;
+        }
+
+        .quests-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .quest-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quest-info {
+            flex: 1;
+        }
+
+        .quest-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .quest-progress {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .quest-reward {
+            font-weight: 700;
+            color: #ff5d8f;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .level-rewards {
+            margin-bottom: 30px;
+        }
+
+        .rewards-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .reward-item {
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .reward-item.unlocked {
+            border-color: #ffafcc;
+            background: linear-gradient(135deg, #fff5f7, #fff0f3);
+        }
+
+        .reward-level {
+            font-weight: 700;
+            color: #ff5d8f;
+            font-size: 1.2rem;
+            min-width: 80px;
+        }
+
+        .reward-content {
+            flex: 1;
+        }
+
+        .reward-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .reward-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .reward-status {
+            font-size: 1.5rem;
+        }
+
+        .inventory {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            min-height: 100px;
+        }
+
+        .inventory-slot {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        .inventory-slot.filled {
+            border: 2px solid #ffafcc;
+            background: white;
+        }
+
+        /* BOTTOM PANEL */
+        .bottom-panel {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .log-panel, .chat-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .log-controls button {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .log {
+            height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+            color: #555;
+        }
+
+        .log-entry.system {
+            color: #666;
+            font-style: italic;
+        }
+
+        .log-entry.tip {
+            color: #00b4d8;
+            background: rgba(0, 180, 216, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        .log-entry.success {
+            color: #27ae60;
+        }
+
+        .log-entry.error {
+            color: #e74c3c;
+        }
+
+        .chat-messages {
+            height: 150px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .chat-message.carry {
+            background: #ffafcc;
+            color: white;
+            margin-right: auto;
+        }
+
+        .chat-message.user {
+            background: #a2d2ff;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-right: 10px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: #ff5d8f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .chat-suggestions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-btn {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* FOOTER */
+        footer {
+            padding-top: 20px;
+            border-top: 2px solid #ffafcc;
+            color: #666;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .footer-section h4 {
+            color: #ff5d8f;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .footer-section a:hover {
+            color: #ff5d8f;
+        }
+
+        .game-info {
+            display: grid;
+            gap: 5px;
+        }
+
+        .small-btn {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        /* MODAL WINDOWS */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #ff5d8f;
+        }
+
+        .instruction-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .instruction-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .instruction-section ul {
+            padding-left: 20px;
+        }
+
+        .instruction-section li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .settings-body {
+            display: grid;
+            gap: 15px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .setting-item label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .danger-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ACHIEVEMENTS */
+        .achievement-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .achievement {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .achievement.unlocked {
+            background: linear-gradient(135deg, #fff5f7, #fff0f3);
+            border: 2px solid #ffafcc;
+        }
+
+        .achievement-icon {
+            font-size: 1.2rem;
+        }
+
+        /* NOTIFICATIONS */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #ff5d8f;
+            animation: slideIn 0.3s ease;
+            z-index: 1001;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .notification.success {
+            border-left-color: #27ae60;
+        }
+
+        .notification.error {
+            border-left-color: #e74c3c;
+        }
+
+        .notification.warning {
+            border-left-color: #ff9e00;
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(1000px) rotate(360deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff5d8f;
+            animation: confetti 2s linear forwards;
+            z-index: 1000;
+        }
+
+        /* PROGRESS BARS */
+        .progress-container {
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffafcc, #ff5d8f);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* LOADING */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff5d8f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* RESPONSIVE ADJUSTMENTS */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .game-area {
+                gap: 15px;
+            }
+            
+            .stats-panel, .main-panel, .rewards-panel {
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .shop-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievement-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* UTILITY CLASSES */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-10 {
+            gap: 10px;
+        }
+
+        .gap-20 {
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <header>
+            <h1><i class="fas fa-heart"></i> Carivers</h1>
+            <p class="subtitle">Заботься о Кэри, прокачивай уровень и получай эксклюзивные гиды!</p>
+            <div class="daily-bonus">
+                <button class="bonus-btn" id="dailyBonus" onclick="claimDailyBonus()">
+                    <i class="fas fa-gift"></i> Ежедневный бонус
+                </button>
+                <span id="bonusTimer">Доступно сейчас!</span>
+            </div>
+        </header>
+
+        <!-- Основная игровая область -->
+        <div class="game-area">
+            <!-- Левая колонка: Статистика -->
+            <div class="stats-panel">
+                <h2><i class="fas fa-chart-line"></i> Статистика Кэри</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Уровень:</span>
+                        <span class="stat-value" id="level">1</span>
+                        <div class="level-bar">
+                            <div class="level-fill" id="level-fill" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Опыт:</span>
+                        <span class="stat-value" id="xp">0/100</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Здоровье:</span>
+                        <span class="stat-value" id="health">100</span>
+                        <div class="health-bar">
+                            <div class="health-fill" id="health-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Настроение:</span>
+                        <span class="stat-value" id="mood">80</span>
+                        <div class="mood-bar">
+                            <div class="mood-fill" id="mood-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Энергия:</span>
+                        <span class="stat-value" id="energy">90</span>
+                        <div class="energy-bar">
+                            <div class="energy-fill" id="energy-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Коины:</span>
+                        <span class="stat-value" id="coins">150</span>
+                        <i class="fas fa-coins coin-icon"></i>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Алмазы:</span>
+                        <span class="stat-value" id="gems">5</span>
+                        <i class="fas fa-gem gem-icon"></i>
+                    </div>
+                </div>
+
+                <div class="telegram-box">
+                    <h3><i class="fab fa-telegram"></i> Telegram Интеграция</h3>
+                    <div class="tg-status">
+                        <div id="tgConnected" class="status-connected">
+                            <i class="fas fa-check-circle"></i> Бот подключен
+                        </div>
+                        <div id="tgDisconnected" class="status-disconnected">
+                            <i class="fas fa-times-circle"></i> Бот не подключен
+                        </div>
+                    </div>
+                    <button class="tg-btn" onclick="connectTelegram()">
+                        <i class="fab fa-telegram"></i> Подключить Telegram
+                    </button>
+                    <div class="tg-features">
+                        <p><i class="fas fa-bell"></i> Уведомления о состоянии</p>
+                        <p><i class="fas fa-gift"></i> +50% к ежедневным бонусам</p>
+                        <p><i class="fas fa-comments"></i> Чат с Кэри в Telegram</p>
+                    </div>
+                </div>
+
+                <div class="achievements">
+                    <h3><i class="fas fa-trophy"></i> Достижения</h3>
+                    <div class="achievement-list" id="achievementList">
+                        <!-- Заполняется скриптом -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Центральная колонка: Кэри и действия -->
+            <div class="main-panel">
+                <div class="character-area">
+                    <div class="character-container">
+                        <div class="character" id="carry-character">
+                            <!-- Кэри рисуется через CSS -->
+                            <div class="character-face" id="character-face">
+                                <div class="eyes">
+                                    <div class="eye left"></div>
+                                    <div class="eye right"></div>
+                                </div>
+                                <div class="mouth" id="mouth"></div>
+                            </div>
+                            <div class="character-hair"></div>
+                            <div class="character-dress"></div>
+                            <div class="character-accessories" id="accessories">
+                                <!-- Аксессуары добавляются здесь -->
+                            </div>
+                        </div>
+                        <div class="character-mood" id="character-mood">
+                            <span id="mood-emoji">😊</span>
+                            <span id="mood-text">Счастлива</span>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <h3><i class="fas fa-play-circle"></i> Действия</h3>
+                        <div class="action-buttons">
+                            <button class="action-btn feed-btn" onclick="feed()">
+                                <i class="fas fa-utensils"></i> Покормить
+                                <span class="action-cost">(-5 коинов)</span>
+                            </button>
+                            <button class="action-btn play-btn" onclick="play()">
+                                <i class="fas fa-gamepad"></i> Поиграть
+                                <span class="action-cost">(-3 энергии)</span>
+                            </button>
+                            <button class="action-btn sleep-btn" onclick="sleep()">
+                                <i class="fas fa-bed"></i> Уложить спать
+                                <span class="action-cost">(+40 энергии)</span>
+                            </button>
+                            <button class="action-btn study-btn" onclick="study()">
+                                <i class="fas fa-book"></i> Учиться
+                                <span class="action-cost">(-10 энергии, +15 XP)</span>
+                            </button>
+                            <button class="action-btn beauty-btn" onclick="beauty()">
+                                <i class="fas fa-spa"></i> Уход
+                                <span class="action-cost">(-7 коинов)</span>
+                            </button>
+                            <button class="action-btn workout-btn" onclick="workout()">
+                                <i class="fas fa-running"></i> Тренировка
+                                <span class="action-cost">(-8 энергии, +10 здоровья)</span>
+                            </button>
+                        </div>
+
+                        <div class="quick-actions">
+                            <h4><i class="fas fa-bolt"></i> Быстрые действия</h4>
+                            <div class="quick-btns">
+                                <button class="quick-btn" onclick="quickAction('hug')">
+                                    <i class="fas fa-hands"></i> Обнять
+                                </button>
+                                <button class="quick-btn" onclick="quickAction('compliment')">
+                                    <i class="fas fa-star"></i> Похвалить
+                                </button>
+                                <button class="quick-btn" onclick="quickAction('music')">
+                                    <i class="fas fa-music"></i> Музыка
+                                </button>
+                                <button class="quick-btn" onclick="quickAction('dance')">
+                                    <i class="fas fa-heart"></i> Танец
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Магазин с табами -->
+                <div class="shop">
+                    <div class="shop-tabs">
+                        <button class="tab-btn active" onclick="openTab('beauty')">Красота</button>
+                        <button class="tab-btn" onclick="openTab('clothes')">Одежда</button>
+                        <button class="tab-btn" onclick="openTab('guides')">Гайды</button>
+                    </div>
+
+                    <div id="beauty" class="tab-content active">
+                        <div class="shop-items">
+                            <div class="shop-item" onclick="buyItem('nail_polish', 20, 'beauty')">
+                                <i class="fas fa-paint-brush"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Лак для ногтей</span>
+                                    <span class="item-desc">+5 к настроению</span>
+                                </div>
+                                <span class="price">20 <i class="fas fa-coins"></i></span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('lipgloss', 35, 'beauty')">
+                                <i class="fas fa-kiss-wink-heart"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Блеск для губ</span>
+                                    <span class="item-desc">+7 к настроению</span>
+                                </div>
+                                <span class="price">35 <i class="fas fa-coins"></i></span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('perfume', 60, 'beauty')">
+                                <i class="fas fa-wind"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Духи</span>
+                                    <span class="item-desc">+10 к настроению</span>
+                                </div>
+                                <span class="price">60 <i class="fas fa-coins"></i></span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('face_mask', 45, 'beauty')">
+                                <i class="fas fa-smile"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Маска для лица</span>
+                                    <span class="item-desc">+8 к здоровью</span>
+                                </div>
+                                <span class="price">45 <i class="fas fa-coins"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="clothes" class="tab-content">
+                        <div class="shop-items">
+                            <div class="shop-item" onclick="buyItem('dress', 80, 'clothes')">
+                                <i class="fas fa-tshirt"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Вечернее платье</span>
+                                    <span class="item-desc">+15 к настроению</span>
+                                </div>
+                                <span class="price">80 <i class="fas fa-coins"></i></span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('shoes', 65, 'clothes')">
+                                <i class="fas fa-shoe-prints"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Туфли</span>
+                                    <span class="item-desc">+12 к настроению</span>
+                                </div>
+                                <span class="price">65 <i class="fas fa-coins"></i></span>
+                            </div>
+                            <div class="shop-item" onclick="buyItem('hat', 30, 'clothes')">
+                                <i class="fas fa-hat-cowboy"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Модная шляпа</span>
+                                    <span class="item-desc">+8 к настроению</span>
+                                </div>
+                                <span class="price">30 <i class="fas fa-coins"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="guides" class="tab-content">
+                        <div class="shop-items">
+                            <div class="shop-item premium" onclick="buyGuide('skin_care', 3)">
+                                <i class="fas fa-book-medical"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Гайд "Уход за кожей"</span>
+                                    <span class="item-desc">Требуется 3 уровень</span>
+                                </div>
+                                <span class="price">Бесплатно</span>
+                            </div>
+                            <div class="shop-item premium" onclick="buyGuide('makeup', 5)">
+                                <i class="fas fa-palette"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Гайд "Макияж"</span>
+                                    <span class="item-desc">Требуется 5 уровень</span>
+                                </div>
+                                <span class="price">Бесплатно</span>
+                            </div>
+                            <div class="shop-item premium" onclick="buyGuide('style', 8)">
+                                <i class="fas fa-vest"></i>
+                                <div class="item-info">
+                                    <span class="item-name">Гайд "Стиль"</span>
+                                    <span class="item-desc">Требуется 8 уровень</span>
+                                </div>
+                                <span class="price">Бесплатно</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка: Награды и прогресс -->
+            <div class="rewards-panel">
+                <h2><i class="fas fa-gift"></i> Прогресс и награды</h2>
+                
+                <div class="daily-quests">
+                    <h3><i class="fas fa-tasks"></i> Ежедневные задания</h3>
+                    <div class="quests-list" id="questsList">
+                        <!-- Заполняется скриптом -->
+                    </div>
+                </div>
+
+                <div class="level-rewards">
+                    <h3><i class="fas fa-medal"></i> Награды за уровни</h3>
+                    <div class="rewards-list">
+                        <div class="reward-item" data-level="1">
+                            <div class="reward-level">Уровень 1</div>
+                            <div class="reward-content">
+                                <div class="reward-name">Стартовый набор</div>
+                                <div class="reward-desc">50 коинов + базовые предметы</div>
+                            </div>
+                            <div class="reward-status" id="reward-1"></div>
+                        </div>
+                        <div class="reward-item" data-level="3">
+                            <div class="reward-level">Уровень 3</div>
+                            <div class="reward-content">
+                                <div class="reward-name">Гайд "Уход за кожей"</div>
+                                <div class="reward-desc">PDF + видео уроки</div>
+                            </div>
+                            <div class="reward-status" id="reward-3"></div>
+                        </div>
+                        <div class="reward-item" data-level="5">
+                            <div class="reward-level">Уровень 5</div>
+                            <div class="reward-content">
+                                <div class="reward-name">Гайд "Макияж"</div>
+                                <div class="reward-desc">Полный курс макияжа</div>
+                            </div>
+                            <div class="reward-status" id="reward-5"></div>
+                        </div>
+                        <div class="reward-item" data-level="8">
+                            <div class="reward-level">Уровень 8</div>
+                            <div class="reward-content">
+                                <div class="reward-name">Гайд "Стиль"</div>
+                                <div class="reward-desc">Как создавать образы</div>
+                            </div>
+                            <div class="reward-status" id="reward-8"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory">
+                    <h3><i class="fas fa-box-open"></i> Инвентарь</h3>
+                    <div class="inventory-grid" id="inventory-grid">
+                        <!-- Заполняется скриптом -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Логи событий и чат -->
+        <div class="bottom-panel">
+            <div class="log-panel">
+                <h3><i class="fas fa-scroll"></i> Журнал событий</h3>
+                <div class="log-controls">
+                    <button onclick="clearLog()"><i class="fas fa-trash"></i> Очистить</button>
+                    <button onclick="saveLog()"><i class="fas fa-download"></i> Сохранить</button>
+                </div>
+                <div class="log" id="game-log">
+                    <div class="log-entry system">[Система] Добро пожаловать в Carivers! Позаботься о Кэри.</div>
+                    <div class="log-entry tip">[Подсказка] Подключи Telegram для ежедневных бонусов!</div>
+                </div>
+            </div>
+
+            <div class="chat-panel">
+                <h3><i class="fas fa-comment-dots"></i> Чат с Кэри</h3>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-message carry">
+                        <span class="chat-time">10:00</span>
+                        <span class="chat-text">Привет! Я Кэри. Давай дружить и заботиться друг о друге! 💖</span>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Напиши Кэри..." maxlength="100">
+                    <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                <div class="chat-suggestions">
+                    <button class="suggestion-btn" onclick="quickChat('Как дела?')">Как дела?</button>
+                    <button class="suggestion-btn" onclick="quickChat('Что хочешь?')">Что хочешь?</button>
+                    <button class="suggestion-btn" onclick="quickChat('Расскажи о себе')">О себе</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Carivers Game</h4>
+                    <p>© 2023 Тамагочи с beauty-гайдами</p>
+                    <p>Версия: 2.0.0</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Навигация</h4>
+                    <a href="#" onclick="showInstructions()">Как играть</a>
+                    <a href="#" onclick="showAbout()">О проекте</a>
+                    <a href="#" onclick="showSettings()">Настройки</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Связь</h4>
+                    <a href="https://t.me/CariversGameBot" target="_blank">Telegram бот</a>
+                    <a href="#" onclick="showFeedback()">Обратная связь</a>
+                    <a href="#" onclick="showUpdates()">Обновления</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Игровая информация</h4>
+                    <div class="game-info">
+                        <span>Время в игре: <span id="gameTime">0 дней</span></span>
+                        <span>Сохранения: <span id="saveCount">1</span></span>
+                        <button class="small-btn" onclick="exportSave()">Экспорт</button>
+                        <button class="small-btn" onclick="importSave()">Импорт</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Игра работает в браузере. Прогресс сохраняется автоматически.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2><i class="fas fa-graduation-cap"></i> Как играть в Carivers?</h2>
+            <div class="modal-body">
+                <div class="instruction-section">
+                    <h3><i class="fas fa-heart"></i> Основные показатели</h3>
+                    <ul>
+                        <li><strong>Здоровье</strong> - уменьшается со временем, восстанавливается едой и отдыхом</li>
+                        <li><strong>Настроение</strong> - влияет на реакцию Кэри, повышается играми и подарками</li>
+                        <li><strong>Энергия</strong> - тратится на действия, восстанавливается сном</li>
+                        <li><strong>Опыт</strong> - получается за все действия, нужен для повышения уровня</li>
+                    </ul>
+                </div>
+                <div class="instruction-section">
+                    <h3><i class="fas fa-coins"></i> Валюта</h3>
+                    <ul>
+                        <li><strong>Коины</strong> - основная валюта, получается за ежедневные задания</li>
+                        <li><strong>Алмазы</strong> - премиум валюта, получается за достижения и уровни</li>
+                    </ul>
+                </div>
+                <div class="instruction-section">
+                    <h3><i class="fas fa-trophy"></i> Прогресс</h3>
+                    <ul>
+                        <li>Каждый уровень открывает новые возможности</li>
+                        <li>За уровни получаются эксклюзивные beauty-гайды</li>
+                        <li>Ежедневные задания дают бонусы</li>
+                        <li>Telegram бот удваивает награды</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2><i class="fas fa-cog"></i> Настройки игры</h2>
+            <div class="settings-body">
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span>Звуковые эффекты</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="notificationsToggle" checked>
+                        <span>Уведомления</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="autoSaveToggle" checked>
+                        <span>Автосохранение (каждые 5 мин)</span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <button class="danger-btn" onclick="resetGame()">
+                        <i class="fas fa-trash"></i> Сбросить игру
+                    </button>
+                    <button onclick="backupGame()">
+                        <i class="fas fa-save"></i> Резервная копия
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notification-area"></div>
+
+    <script>
+        // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
+        let gameState = {
+            level: 1,
+            xp: 0,
+            xpNeeded: 100,
+            health: 100,
+            mood: 80,
+            energy: 90,
+            coins: 150,
+            gems: 5,
+            inventory: [],
+            achievements: ['first_login', 'first_action'],
+            dailyQuests: {},
+            lastDailyBonus: 0,
+            playTime: 0,
+            saveCount: 1,
+            settings: {
+                sound: true,
+                notifications: true,
+                autoSave: true
+            },
+            characterMood: 'happy',
+            accessories: []
+        };
+
+        // ========== ДОСТИЖЕНИЯ ==========
+        const achievementsList = [
+            { id: 'first_login', name: 'Первый вход', icon: 'fas fa-door-open', desc: 'Зашли в игру впервые' },
+            { id: 'first_action', name: 'Первое действие', icon: 'fas fa-star', desc: 'Выполнили первое действие' },
+            { id: 'level_5', name: 'Опытный', icon: 'fas fa-level-up-alt', desc: 'Достигли 5 уровня' },
+            { id: 'rich', name: 'Богач', icon: 'fas fa-money-bill-wave', desc: 'Накопили 500 коинов' },
+            { id: 'shopper', name: 'Шопоголик', icon: 'fas fa-shopping-cart', desc: 'Купили 10 предметов' },
+            { id: 'caretaker', name: 'Заботливый', icon: 'fas fa-heart', desc: 'Поддерживали здоровье выше 80% 24 часа' }
+        ];
+
+        // ========== ЕЖЕДНЕВНЫЕ ЗАДАНИЯ ==========
+        const dailyQuestsTemplate = [
+            { id: 'feed_3', name: 'Покормить 3 раза', target: 3, progress: 0, reward: 50, type: 'coins' },
+            { id: 'play_5', name: 'Поиграть 5 раз', target: 5, progress: 0, reward: 30, type: 'coins' },
+            { id: 'study_2', name: 'Поучиться 2 раза', target: 2, progress: 0, reward: 40, type: 'coins' },
+            { id: 'buy_item', name: 'Купить предмет', target: 1, progress: 0, reward: 20, type: 'coins' }
+        ];
+
+        // ========== ИНИЦИАЛИЗАЦИЯ ИГРЫ ==========
+        function initGame() {
+            loadGame();
+            updateDisplay();
+            startGameLoop();
+            setupDailyQuests();
+            updateAchievementsDisplay();
+            addLog('[Система] Игра загружена! Приятной игры!', 'system');
+            
+            // Первое сообщение от Кэри
+            setTimeout(() => {
+                addChatMessage('carry', 'Привет! Я Кэри. Рада познакомиться! 💕');
+            }, 1000);
+        }
+
+        // ========== ИГРОВОЙ ЦИКЛ ==========
+        function startGameLoop() {
+            // Основной цикл (каждые 10 секунд)
+            setInterval(() => {
+                // Уменьшение показателей со временем
+                gameState.health = Math.max(0, gameState.health - 0.5);
+                gameState.mood = Math.max(0, gameState.mood - 0.3);
+                gameState.energy = Math.max(0, gameState.energy - 0.4);
+                
+                // Увеличение времени игры
+                gameState.playTime += 10;
+                
+                // Обновление настроения персонажа
+                updateCharacterMood();
+                
+                // Обновление отображения
+                updateDisplay();
+                
+                // Проверка повышения уровня
+                checkLevelUp();
+                
+                // Проверка достижений
+                checkAchievements();
+                
+                // Автосохранение
+                if (gameState.settings.autoSave && gameState.playTime % 300 === 0) {
+                    saveGame();
+                    addLog('[Система] Игра сохранена автоматически', 'system');
+                }
+            }, 10000);
+            
+            // Обновление таймера бонуса каждую секунду
+            setInterval(updateBonusTimer, 1000);
+        }
+
+        // ========== ОБНОВЛЕНИЕ ОТОБРАЖЕНИЯ ==========
+        function updateDisplay() {
+            // Обновление чисел
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('xp').textContent = `${Math.floor(gameState.xp)}/${gameState.xpNeeded}`;
+            document.getElementById('health').textContent = Math.floor(gameState.health);
+            document.getElementById('mood').textContent = Math.floor(gameState.mood);
+            document.getElementById('energy').textContent = Math.floor(gameState.energy);
+            document.getElementById('coins').textContent = gameState.coins;
+            document.getElementById('gems').textContent = gameState.gems;
+            document.getElementById('gameTime').textContent = `${Math.floor(gameState.playTime / 3600)} дней`;
+            document.getElementById('saveCount').textContent = gameState.saveCount;
+            
+            // Обновление прогресс-баров
+            document.getElementById('level-fill').style.width = `${(gameState.xp / gameState.xpNeeded) * 100}%`;
+            document.getElementById('health-fill').style.width = `${gameState.health}%`;
+            document.getElementById('mood-fill').style.width = `${gameState.mood}%`;
+            document.getElementById('energy-fill').style.width = `${gameState.energy}%`;
+            
+            // Обновление инвентаря
+            updateInventoryDisplay();
+            
+            // Обновление наград
+            updateRewardsDisplay();
+            
+            // Обновление заданий
+            updateQuestsDisplay();
+        }
+
+        // ========== ДЕЙСТВИЯ ИГРОКА ==========
+        function feed() {
+            if (gameState.coins >= 5) {
+                gameState.coins -= 5;
+                gameState.health = Math.min(100, gameState.health + 15);
+                gameState.mood = Math.min(100, gameState.mood + 5);
+                gameState.energy = Math.min(100, gameState.energy + 5);
+                gameState.xp += 10;
+                
+                addLog('[Действие] Вы покормили Кэри. +15 здоровья, +5 настроения', 'success');
+                updateQuestProgress('feed_3');
+                animateAction('feed');
+                
+                // Случайный ответ Кэри
+                const responses = [
+                    'Ммм, вкусно! Спасибо! 🍎',
+                    'Я наелась! Теперь полна сил! 💪',
+                    'Так вкусно! Ты лучший! 😋'
+                ];
+                addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+            } else {
+                addLog('[Ошибка] Недостаточно коинов для еды!', 'error');
+                showNotification('Недостаточно коинов!', 'error');
+            }
+            updateDisplay();
+        }
+
+        function play() {
+            if (gameState.energy >= 3) {
+                gameState.energy -= 3;
+                gameState.mood = Math.min(100, gameState.mood + 20);
+                gameState.health = Math.min(100, gameState.health + 5);
+                gameState.xp += 15;
+                
+                addLog('[Действие] Вы поиграли с Кэри. +20 настроения, -3 энергии', 'success');
+                updateQuestProgress('play_5');
+                animateAction('play');
+                
+                const responses = [
+                    'Ура! Играть так весело! 🎮',
+                    'Хи-хи, это было забавно! 😄',
+                    'Давай ещё поиграем! Я обожаю игры! 🎲'
+                ];
+                addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+            } else {
+                addLog('[Ошибка] У Кэри недостаточно энергии для игр!', 'error');
+                showNotification('Кэри устала! Дайте ей отдохнуть.', 'warning');
+            }
+            updateDisplay();
+        }
+
+        function sleep() {
+            gameState.energy = Math.min(100, gameState.energy + 40);
+            gameState.health = Math.min(100, gameState.health + 10);
+            gameState.mood = Math.min(100, gameState.mood + 5);
+            gameState.xp += 20;
+            
+            addLog('[Действие] Кэри поспала. +40 энергии, +10 здоровья', 'success');
+            animateAction('sleep');
+            
+            const responses = [
+                'Я выспалась! Полна энергии! ⭐',
+                'Как хорошо поспать... Теперь готова к новым приключениям! 💤',
+                'Спасибо, что дал мне отдохнуть! 😴'
+            ];
+            addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+            updateDisplay();
+        }
+
+        function study() {
+            if (gameState.energy >= 10) {
+                gameState.energy -= 10;
+                gameState.xp += 25;
+                gameState.mood = Math.max(0, gameState.mood - 5);
+                
+                addLog('[Действие] Кэри поучилась. +25 опыта, -10 энергии', 'success');
+                updateQuestProgress('study_2');
+                animateAction('study');
+                
+                const responses = [
+                    'Учиться полезно! Теперь я умнее! 📚',
+                    'Знания - это сила! 💡',
+                    'Немного устала от учёбы, но оно того стоит! 🎓'
+                ];
+                addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+            } else {
+                addLog('[Ошибка] Слишком устала для учебы!', 'error');
+                showNotification('Кэри слишком устала для учёбы.', 'warning');
+            }
+            updateDisplay();
+        }
+
+        function beauty() {
+            if (gameState.coins >= 7) {
+                gameState.coins -= 7;
+                gameState.mood = Math.min(100, gameState.mood + 25);
+                gameState.xp += 18;
+                
+                addLog('[Действие] Кэри сделала уход за собой. +25 настроения, -7 коинов', 'success');
+                animateAction('beauty');
+                
+                const responses = [
+                    'Я чувствую себя прекрасно! 💅',
+                    'Уход за собой - это важно! 💖',
+                    'Спасибо за заботу! Я сияю! ✨'
+                ];
+                addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+            } else {
+                addLog('[Ошибка] Недостаточно коинов для процедур красоты!', 'error');
+                showNotification('Недостаточно коинов для ухода!', 'error');
+            }
+            updateDisplay();
+        }
+
+        function workout() {
+            if (gameState.energy >= 8) {
+                gameState.energy -= 8;
+                gameState.health = Math.min(100, gameState.health + 10);
+                gameState.xp += 15;
+                
+                addLog('[Действие] Кэри потренировалась. +10 здоровья, -8 энергии', 'success');
+                animateAction('workout');
+                
+                const responses = [
+                    'Фух, хорошая тренировка! 🏃‍♀️',
+                    'Теперь я сильнее и здоровее! 💪',
+                    'Спорт - это здорово! 🏋️‍♀️'
+                ];
+                addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+            } else {
+                addLog('[Ошибка] Недостаточно энергии для тренировки!', 'error');
+                showNotification('Недостаточно энергии!', 'warning');
+            }
+            updateDisplay();
+        }
+
+        // ========== БЫСТРЫЕ ДЕЙСТВИЯ ==========
+        function quickAction(action) {
+            switch(action) {
+                case 'hug':
+                    gameState.mood = Math.min(100, gameState.mood + 15);
+                    addLog('[Действие] Вы обняли Кэри. +15 настроения', 'success');
+                    addChatMessage('carry', 'Обнимашки - лучшие! 🤗');
+                    break;
+                case 'compliment':
+                    gameState.mood = Math.min(100, gameState.mood + 10);
+                    addLog('[Действие] Вы похвалили Кэри. +10 настроения', 'success');
+                    addChatMessage('carry', 'Спасибо за комплимент! Я краснею! 😊');
+                    break;
+                case 'music':
+                    gameState.mood = Math.min(100, gameState.mood + 12);
+                    addLog('[Действие] Вы включили музыку. +12 настроения', 'success');
+                    addChatMessage('carry', 'Отличная музыка! Давай потанцуем! 🎵');
+                    break;
+                case 'dance':
+                    if (gameState.energy >= 5) {
+                        gameState.energy -= 5;
+                        gameState.mood = Math.min(100, gameState.mood + 20);
+                        addLog('[Действие] Вы потанцевали с Кэри. +20 настроения, -5 энергии', 'success');
+                        addChatMessage('carry', 'Весело! Танцы - моя страсть! 💃');
+                    }
+                    break;
+            }
+            animateAction(action);
+            updateDisplay();
+        }
+
+        // ========== МАГАЗИН ==========
+        function openTab(tabName) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активный класс со всех кнопок
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(tabName).classList.add('active');
+            
+            // Активировать кнопку
+            event.target.classList.add('active');
+        }
+
+        function buyItem(itemName, price, category) {
+            if (gameState.coins >= price) {
+                gameState.coins -= price;
+                gameState.inventory.push({
+                    id: itemName,
+                    name: getItemName(itemName),
+                    category: category,
+                    price: price
+                });
+                gameState.mood = Math.min(100, gameState.mood + getItemMoodBonus(itemName));
+                gameState.xp += 30;
+                
+                addLog(`[Покупка] Вы купили ${getItemName(itemName)} за ${price} коинов`, 'success');
+                updateQuestProgress('buy_item');
+                animateAction('buy');
+                showNotification(`Куплено: ${getItemName(itemName)}!`, 'success');
+                
+                // Добавление аксессуара
+                addAccessory(itemName);
+                
+                const responses = [
+                    'Вау, спасибо за подарок! 🎁',
+                    'Как красиво! Я обожаю это! 💖',
+                    'Ты сделал меня счастливой! 😍'
+                ];
+                addChatMessage('carry', responses[Math.floor(Math.random() * responses.length)]);
+                
+                updateDisplay();
+            } else {
+                addLog(`[Ошибка] Недостаточно коинов для покупки! Нужно ${price} коинов`, 'error');
+                showNotification('Недостаточно коинов!', 'error');
+            }
+        }
+
+        function buyGuide(guideName, requiredLevel) {
+            if (gameState.level >= requiredLevel) {
+                if (!gameState.inventory.some(item => item.id === guideName)) {
+                    gameState.inventory.push({
+                        id: guideName,
+                        name: getGuideName(guideName),
+                        category: 'guide',
+                        type: 'guide'
+                    });
+                    
+                    addLog(`[Награда] Вы получили гайд "${getGuideName(guideName)}"`, 'success');
+                    animateAction('guide');
+                    showNotification(`Получен гайд: ${getGuideName(guideName)}!`, 'success');
+                    
+                    addChatMessage('carry', 'Отличный гайд! Теперь я знаю больше! 📚');
+                    
+                    updateDisplay();
+                } else {
+                    showNotification('Этот гайд уже получен!', 'warning');
+                }
+            } else {
+                showNotification(`Требуется ${requiredLevel} уровень!`, 'error');
+            }
+        }
+
+        function getItemName(itemId) {
+            const items = {
+                'nail_polish': 'Лак для ногтей',
+                'lipgloss': 'Блеск для губ',
+                'perfume': 'Духи',
+                'face_mask': 'Маска для лица',
+                'dress': 'Вечернее платье',
+                'shoes': 'Туфли',
+                'hat': 'Модная шляпа'
+            };
+            return items[itemId] || itemId;
+        }
+
+        function getGuideName(guideId) {
+            const guides = {
+                'skin_care': 'Гайд "Уход за кожей"',
+                'makeup': 'Гайд "Макияж"',
+                'style': 'Гайд "Стиль"'
+            };
+            return guides[guideId] || guideId;
+        }
+
+        function getItemMoodBonus(itemId) {
+            const bonuses = {
+                'nail_polish': 5,
+                'lipgloss': 7,
+                'perfume': 10,
+                'face_mask': 8,
+                'dress': 15,
+                'shoes': 12,
+                'hat': 8
+            };
+            return bonuses[itemId] || 5;
+        }
+
+        // ========== АКСЕССУАРЫ ==========
+        function addAccessory(itemId) {
+            const accessoryPositions = {
+                'nail_polish': { top: '70%', left: '30%', emoji: '💅' },
+                'lipgloss': { top: '50%', left: '50%', emoji: '💋' },
+                'perfume': { top: '20%', left: '70%', emoji: '🌸' },
+                'hat': { top: '10%', left: '50%', emoji: '👒' }
+            };
+            
+            if (accessoryPositions[itemId]) {
+                const pos = accessoryPositions[itemId];
+                const accessory = document.createElement('div');
+                accessory.className = 'accessory';
+                accessory.textContent = pos.emoji;
+                accessory.style.top = pos.top;
+                accessory.style.left = pos.left;
+                
+                document.getElementById('accessories').appendChild(accessory);
+                
+                // Сохраняем в состояние
+                gameState.accessories.push(itemId);
+            }
+        }
+
+        // ========== ЕЖЕДНЕВНЫЙ БОНУС ==========
+        function claimDailyBonus() {
+            const now = Date.now();
+            const lastBonus = gameState.lastDailyBonus;
+            const twentyFourHours = 24 * 60 * 60 * 1000;
+            
+            if (now - lastBonus >= twentyFourHours || lastBonus === 0) {
+                let bonusCoins = 50;
+                let bonusGems = 1;
+                
+                // Бонус за подключение Telegram
+                if (isTelegramConnected()) {
+                    bonusCoins = Math.floor(bonusCoins * 1.5);
+                    bonusGems = 2;
+                }
+                
+                gameState.coins += bonusCoins;
+                gameState.gems += bonusGems;
+                gameState.lastDailyBonus = now;
+                
+                addLog(`[Бонус] Получен ежедневный бонус: ${bonusCoins} коинов и ${bonusGems} алмазов`, 'success');
+                showNotification(`Ежедневный бонус: +${bonusCoins} коинов, +${bonusGems} алмазов!`, 'success');
+                animateAction('bonus');
+                
+                // Отключить кнопку на 24 часа
+                const bonusBtn = document.getElementById('dailyBonus');
+                bonusBtn.disabled = true;
+                bonusBtn.innerHTML = '<i class="fas fa-gift"></i> Бонус получен';
+                
+                addChatMessage('carry', 'Спасибо за ежедневный визит! 🎁');
+                
+                updateDisplay();
+                saveGame();
+            } else {
+                showNotification('Бонус уже получен сегодня!', 'warning');
+            }
+        }
+
+        function updateBonusTimer() {
+            const now = Date.now();
+            const lastBonus = gameState.lastDailyBonus;
+            const twentyFourHours = 24 * 60 * 60 * 1000;
+            const nextBonus = lastBonus + twentyFourHours;
+            
+            if (now >= nextBonus || lastBonus === 0) {
+                document.getElementById('bonusTimer').textContent = 'Доступно сейчас!';
+                const bonusBtn = document.getElementById('dailyBonus');
+                bonusBtn.disabled = false;
+                bonusBtn.innerHTML = '<i class="fas fa-gift"></i> Ежедневный бонус';
+            } else {
+                const remaining = nextBonus - now;
+                const hours = Math.floor(remaining / (60 * 60 * 1000));
+                const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                
+                document.getElementById('bonusTimer').textContent = `Через: ${hours}ч ${minutes}м`;
+            }
+        }
+
+        // ========== ЕЖЕДНЕВНЫЕ ЗАДАНИЯ ==========
+        function setupDailyQuests() {
+            const today = new Date().toDateString();
+            
+            if (!gameState.dailyQuests.date || gameState.dailyQuests.date !== today) {
+                // Создать новые задания на сегодня
+                gameState.dailyQuests = {
+                    date: today,
+                    quests: JSON.parse(JSON.stringify(dailyQuestsTemplate))
+                };
+                saveGame();
+            }
+        }
+
+        function updateQuestProgress(questId) {
+            if (gameState.dailyQuests.quests) {
+                const quest = gameState.dailyQuests.quests.find(q => q.id === questId);
+                if (quest && quest.progress < quest.target) {
+                    quest.progress++;
+                    
+                    if (quest.progress >= quest.target) {
+                        // Награда за выполнение задания
+                        gameState.coins += quest.reward;
+                        addLog(`[Задание] Выполнено: ${quest.name}! Награда: ${quest.reward} коинов`, 'success');
+                        showNotification(`Задание выполнено! +${quest.reward} коинов`, 'success');
+                    }
+                    
+                    saveGame();
+                }
+            }
+        }
+
+        function updateQuestsDisplay() {
+            const container = document.getElementById('questsList');
+            if (!container || !gameState.dailyQuests.quests) return;
+            
+            container.innerHTML = '';
+            
+            gameState.dailyQuests.quests.forEach(quest => {
+                const questEl = document.createElement('div');
+                questEl.className = 'quest-item';
+                questEl.innerHTML = `
+                    <div class="quest-info">
+                        <div class="quest-name">${quest.name}</div>
+                        <div class="quest-progress">${quest.progress}/${quest.target}</div>
+                    </div>
+                    <div class="quest-reward">
+                        ${quest.reward} <i class="fas fa-coins"></i>
+                    </div>
+                `;
+                container.appendChild(questEl);
+            });
+        }
+
+        // ========== ДОСТИЖЕНИЯ ==========
+        function checkAchievements() {
+            // Проверка достижения уровня 5
+            if (gameState.level >= 5 && !gameState.achievements.includes('level_5')) {
+                gameState.achievements.push('level_5');
+                unlockAchievement('level_5');
+            }
+            
+            // Проверка богатства
+            if (gameState.coins >= 500 && !gameState.achievements.includes('rich')) {
+                gameState.achievements.push('rich');
+                unlockAchievement('rich');
+            }
+            
+            // Проверка покупок
+            if (gameState.inventory.length >= 10 && !gameState.achievements.includes('shopper')) {
+                gameState.achievements.push('shopper');
+                unlockAchievement('shopper');
+            }
+        }
+
+        function unlockAchievement(achievementId) {
+            const achievement = achievementsList.find(a => a.id === achievementId);
+            if (achievement) {
+                addLog(`[Достижение] Получено: ${achievement.name}!`, 'success');
+                showNotification(`Новое достижение: ${achievement.name}!`, 'success');
+                
+                // Награда за достижение
+                gameState.gems += 3;
+                gameState.xp += 50;
+                
+                updateAchievementsDisplay();
+                saveGame();
+            }
+        }
+
+        function updateAchievementsDisplay() {
+            const container = document.getElementById('achievementList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            achievementsList.forEach(achievement => {
+                const isUnlocked = gameState.achievements.includes(achievement.id);
+                const achievementEl = document.createElement('div');
+                achievementEl.className = `achievement ${isUnlocked ? 'unlocked' : ''}`;
+                achievementEl.innerHTML = `
+                    <div class="achievement-icon">${isUnlocked ? '🏆' : '🔒'}</div>
+                    <div>
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div class="achievement-desc">${achievement.desc}</div>
+                    </div>
+                `;
+                container.appendChild(achievementEl);
+            });
+        }
+
+        // ========== ПРОВЕРКА УРОВНЯ ==========
+        function checkLevelUp() {
+            if (gameState.xp >= gameState.xpNeeded) {
+                gameState.level++;
+                const oldXp = gameState.xp;
+                gameState.xp = oldXp - gameState.xpNeeded;
+                gameState.xpNeeded = Math.floor(gameState.xpNeeded * 1.5);
+                
+                // Награда за уровень
+                const levelReward = gameState.level * 25;
+                gameState.coins += levelReward;
+                gameState.gems += 1;
+                
+                addLog(`[Уровень] Поздравляем! Кэри достигла ${gameState.level} уровня!`, 'success');
+                showNotification(`Новый уровень ${gameState.level}! +${levelReward} коинов`, 'success');
+                animateLevelUp();
+                
+                // Специальные награды за уровни
+                if (gameState.level === 3) {
+                    addLog('[Награда] Доступен гайд "Уход за кожей"!', 'tip');
+                } else if (gameState.level === 5) {
+                    addLog('[Награда] Доступен гайд "Макияж"!', 'tip');
+                } else if (gameState.level === 8) {
+                    addLog('[Награда] Доступен гайд "Стиль"!', 'tip');
+                }
+                
+                addChatMessage('carry', `Ура! Я достигла ${gameState.level} уровня! 🎉`);
+                
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        function updateRewardsDisplay() {
+            const rewards = document.querySelectorAll('.reward-item');
+            rewards.forEach(reward => {
+                const level = parseInt(reward.getAttribute('data-level'));
+                const statusEl = reward.querySelector('.reward-status');
+                
+                if (gameState.level >= level) {
+                    reward.classList.add('unlocked');
+                    statusEl.innerHTML = '✅';
+                } else {
+                    reward.classList.remove('unlocked');
+                    statusEl.innerHTML = '🔒';
+                }
+            });
+        }
+
+        // ========== ИНВЕНТАРЬ ==========
+        function updateInventoryDisplay() {
+            const container = document.getElementById('inventory-grid');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Показываем купленные предметы
+            gameState.inventory.forEach((item, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'inventory-slot filled';
+                slot.title = item.name;
+                slot.innerHTML = `<i class="fas fa-box"></i>`;
+                container.appendChild(slot);
+            });
+            
+            // Пустые слоты
+            const emptySlots = 12 - gameState.inventory.length;
+            for (let i = 0; i < emptySlots; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'inventory-slot';
+                slot.innerHTML = '+';
+                container.appendChild(slot);
+            }
+        }
+
+        // ========== НАСТРОЕНИЕ ПЕРСОНАЖА ==========
+        function updateCharacterMood() {
+            const mouth = document.getElementById('mouth');
+            const moodEmoji = document.getElementById('mood-emoji');
+            const moodText = document.getElementById('mood-text');
+            
+            // Сбрасываем все классы
+            mouth.className = 'mouth';
+            
+            if (gameState.mood >= 80) {
+                mouth.classList.add('happy');
+                moodEmoji.textContent = '😊';
+                moodText.textContent = 'Счастлива';
+                gameState.characterMood = 'happy';
+            } else if (gameState.mood >= 60) {
+                mouth.classList.add('neutral');
+                moodEmoji.textContent = '🙂';
+                moodText.textContent = 'Довольна';
+                gameState.characterMood = 'neutral';
+            } else if (gameState.mood >= 40) {
+                mouth.classList.add('neutral');
+                moodEmoji.textContent = '😐';
+                moodText.textContent = 'Нормально';
+                gameState.characterMood = 'neutral';
+            } else if (gameState.mood >= 20) {
+                mouth.classList.add('sad');
+                moodEmoji.textContent = '😟';
+                moodText.textContent = 'Грустно';
+                gameState.characterMood = 'sad';
+            } else {
+                mouth.classList.add('sad');
+                moodEmoji.textContent = '😭';
+                moodText.textContent = 'Плачет';
+                gameState.characterMood = 'sad';
+            }
+            
+            // Мигание глаз
+            if (Math.random() > 0.99) {
+                const eyes = document.querySelectorAll('.eye::after');
+                eyes.forEach(eye => {
+                    eye.style.transform = 'scaleY(0.1)';
+                    setTimeout(() => {
+                        eye.style.transform = 'scaleY(1)';
+                    }, 100);
+                });
+            }
+        }
+
+        // ========== ЧАТ ==========
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Сообщение игрока
+                addChatMessage('user', message);
+                
+                // Ответ Кэри (через 1-3 секунды)
+                setTimeout(() => {
+                    const responses = [
+                        'Интересно! Расскажи ещё! 💭',
+                        'Поняла тебя! 👌',
+                        'Хм, хорошая мысль! 🤔',
+                        'Спасибо, что делишься со мной! 💕',
+                        'Я рада, что мы можем общаться! 😊',
+                        'Отличная тема для разговора! 👍'
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addChatMessage('carry', randomResponse);
+                    
+                    // Увеличение настроения за общение
+                    gameState.mood = Math.min(100, gameState.mood + 3);
+                    updateDisplay();
+                }, 1000 + Math.random() * 2000);
+                
+                input.value = '';
+            }
+        }
+
+        function quickChat(message) {
+            document.getElementById('chatInput').value = message;
+            sendMessage();
+        }
+
+        function addChatMessage(sender, text) {
+            const container = document.getElementById('chat-messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = `chat-message ${sender}`;
+            
+            const now = new Date();
+            const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            messageEl.innerHTML = `
+                <span class="chat-time">${time}</span>
+                <span class="chat-text">${text}</span>
+            `;
+            
+            container.appendChild(messageEl);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ========== TELEGRAM ИНТЕГРАЦИЯ ==========
+        function connectTelegram() {
+            addLog('[Telegram] Подключение к боту...', 'system');
+            showNotification('Откройте Telegram и найдите @CariversGameBot', 'tip');
+            
+            // Имитация подключения
+            setTimeout(() => {
+                document.getElementById('tgConnected').style.display = 'flex';
+                document.getElementById('tgDisconnected').style.display = 'none';
+                
+                addLog('[Telegram] Бот успешно подключен!', 'success');
+                showNotification('Telegram бот подключен! Бонусы увеличены на 50%!', 'success');
+                
+                addChatMessage('carry', 'Теперь мы можем общаться в Telegram тоже! 📱');
+                
+                // Бонус за подключение
+                gameState.coins += 100;
+                gameState.gems += 2;
+                updateDisplay();
+                saveGame();
+            }, 2000);
+        }
+
+        function isTelegramConnected() {
+            return document.getElementById('tgConnected').style.display === 'flex';
+        }
+
+        // ========== ЖУРНАЛ СОБЫТИЙ ==========
+        function addLog(message, type = 'system') {
+            const container = document.getElementById('game-log');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = message;
+            
+            container.appendChild(logEntry);
+            container.scrollTop = container.scrollHeight;
+            
+            // Ограничение количества записей
+            const maxEntries = 50;
+            if (container.children.length > maxEntries) {
+                container.removeChild(container.firstChild);
+            }
+        }
+
+        function clearLog() {
+            const container = document.getElementById('game-log');
+            container.innerHTML = '<div class="log-entry system">[Система] Журнал очищен</div>';
+        }
+
+        function saveLog() {
+            const logText = Array.from(document.querySelectorAll('.log-entry'))
+                .map(entry => entry.textContent)
+                .join('\n');
+            
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `carivers-log-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Журнал сохранён!', 'success');
+        }
+
+        // ========== АНИМАЦИИ ==========
+        function animateAction(action) {
+            const character = document.getElementById('carry-character');
+            character.classList.add('pulse');
+            
+            setTimeout(() => {
+                character.classList.remove('pulse');
+            }, 500);
+            
+            // Эффект частиц для некоторых действий
+            if (action === 'bonus' || action === 'guide') {
+                createConfetti();
+            }
+        }
+
+        function animateLevelUp() {
+            const character = document.getElementById('carry-character');
+            character.classList.add('pulse');
+            
+            // Создать конфетти
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => createConfetti(), i * 50);
+            }
+            
+            setTimeout(() => {
+                character.classList.remove('pulse');
+            }, 2000);
+        }
+
+        function createConfetti() {
+            const colors = ['#ff5d8f', '#ffafcc', '#a2d2ff', '#cdb4db', '#ffd166'];
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = Math.random() * 10 + 5 + 'px';
+            confetti.style.height = Math.random() * 10 + 5 + 'px';
+            
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 2000);
+        }
+
+        // ========== УВЕДОМЛЕНИЯ ==========
+        function showNotification(message, type = 'info') {
+            if (!gameState.settings.notifications) return;
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            const container = document.getElementById('notification-area') || document.body;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // ========== СОХРАНЕНИЕ ИГРЫ ==========
+        function saveGame() {
+            gameState.saveCount++;
+            localStorage.setItem('carivers_save', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('carivers_save');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                
+                // Сохраняем важные настройки
+                const oldSettings = gameState.settings;
+                
+                // Обновляем состояние
+                gameState = { ...gameState, ...loaded };
+                
+                // Восстанавливаем настройки
+                gameState.settings = { ...oldSettings, ...loaded.settings };
+                
+                addLog('[Система] Игра загружена из сохранения', 'system');
+            }
+        }
+
+        function exportSave() {
+            const saveData = JSON.stringify(gameState, null, 2);
+            const blob = new Blob([saveData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `carivers-save-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Сохранение экспортировано!', 'success');
+        }
+
+        function importSave() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const loaded = JSON.parse(e.target.result);
+                        gameState = loaded;
+                        updateDisplay();
+                        updateAchievementsDisplay();
+                        saveGame();
+                        showNotification('Сохранение импортировано!', 'success');
+                        addLog('[Система] Игра загружена из файла', 'system');
+                    } catch (error) {
+                        showNotification('Ошибка загрузки файла!', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function backupGame() {
+            saveGame();
+            showNotification('Резервная копия создана!', 'success');
+        }
+
+        function resetGame() {
+            if (confirm('Вы уверены? Весь прогресс будет удален!')) {
+                localStorage.removeItem('carivers_save');
+                gameState = {
+                    level: 1,
+                    xp: 0,
+                    xpNeeded: 100,
+                    health: 100,
+                    mood: 80,
+                    energy: 90,
+                    coins: 150,
+                    gems: 5,
+                    inventory: [],
+                    achievements: ['first_login', 'first_action'],
+                    dailyQuests: {},
+                    lastDailyBonus: 0,
+                    playTime: 0,
+                    saveCount: 1,
+                    settings: gameState.settings,
+                    characterMood: 'happy',
+                    accessories: []
+                };
+                
+                updateDisplay();
+                updateAchievementsDisplay();
+                setupDailyQuests();
+                clearLog();
+                addLog('[Система] Игра сброшена. Начинаем заново!', 'system');
+                showNotification('Игра сброшена!', 'success');
+                
+                // Очистка аксессуаров
+                document.getElementById('accessories').innerHTML = '';
+                
+                // Новое приветствие
+                addChatMessage('carry', 'Привет! Давай начнем нашу дружбу заново! 💖');
+            }
+        }
+
+        // ========== МОДАЛЬНЫЕ ОКНА ==========
+        function showInstructions() {
+            document.getElementById('instructions-modal').style.display = 'block';
+        }
+
+        function showSettings() {
+            document.getElementById('settings-modal').style.display = 'block';
+            
+            // Загрузка текущих настроек
+            document.getElementById('soundToggle').checked = gameState.settings.sound;
+            document.getElementById('notificationsToggle').checked = gameState.settings.notifications;
+            document.getElementById('autoSaveToggle').checked = gameState.settings.autoSave;
+        }
+
+        function showAbout() {
+            alert('Carivers - игра про девочку Кэри\n\n' +
+                  'Версия: 2.0.0\n' +
+                  'Автор: Carivers Team\n\n' +
+                  'Игра создана с любовью для всех, кто хочет научиться заботе о себе и других! 💖');
+        }
+
+        function showFeedback() {
+            alert('Обратная связь:\n\n' +
+                  'Telegram: @CariversGameBot\n' +
+                  'Email: feedback@carivers-game.com\n\n' +
+                  'Мы ценим ваше мнение! 💌');
+        }
+
+        function showUpdates() {
+            alert('Последние обновления:\n\n' +
+                  'Версия 2.0.0:\n' +
+                  '• Полный редизайн игры\n' +
+                  '• Добавлена система достижений\n' +
+                  '• Ежедневные задания и бонусы\n' +
+                  '• Улучшенный магазин\n' +
+                  '• Чат с Кэри\n' +
+                  '• Система сохранения\n\n' +
+                  'Следите за обновлениями! ✨');
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Сохранение настроек
+            if (document.getElementById('settings-modal').style.display === 'none') {
+                gameState.settings.sound = document.getElementById('soundToggle').checked;
+                gameState.settings.notifications = document.getElementById('notificationsToggle').checked;
+                gameState.settings.autoSave = document.getElementById('autoSaveToggle').checked;
+                saveGame();
+            }
+        }
+
+        // ========== ЗАГРУЗКА ИГРЫ ==========
+        window.onload = function() {
+            initGame();
+            
+            // Закрытие модальных окон при клике вне их
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    closeModal();
+                }
+            };
+            
+            // Отправка сообщения по Enter
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
