@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KERYVERSE - Mobile Doll Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff66cc;
+            --primary-blue: #66ccff;
+            --secondary-pink: #ff99cc;
+            --secondary-blue: #87ceeb;
+            --accent-yellow: #ffcc66;
+            --accent-purple: #cc66ff;
+            --light-bg: #fff5f7;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --success: #4cd964;
+            --warning: #ffcc00;
+            --error: #ff3b30;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, #e6f7ff 100%);
+            color: var(--text-dark);
+            position: fixed;
+        }
+
+        /* Desktop Warning */
+        .desktop-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-pink) 0%, var(--primary-blue) 100%);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        @media (min-width: 769px) {
+            .desktop-warning {
+                display: flex;
+            }
+            
+            .mobile-app {
+                display: none;
+            }
+        }
+
+        /* Mobile App Container */
+        .mobile-app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .time {
+            font-weight: 700;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Page Container */
+        .page-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            padding-bottom: 100px;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        /* Header */
+        .header {
+            padding: 15px 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            line-height: 1;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 15px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            margin: 0 0 20px 0;
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            box-shadow: 0 3px 10px rgba(102, 204, 255, 0.3);
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Character Section */
+        .character-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-pink), var(--primary-blue));
+        }
+
+        .character-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Enhanced Doll Design */
+        .mobile-doll {
+            position: relative;
+            width: 180px;
+            height: 250px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .doll-hair {
+            position: absolute;
+            width: 140px;
+            height: 90px;
+            background: linear-gradient(135deg, #ffd700, #ffcc66, #fffacd);
+            border-radius: 50% 50% 40% 40%;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 
+                0 5px 15px rgba(255, 215, 0, 0.3),
+                inset 0 -5px 10px rgba(255, 204, 102, 0.5);
+            animation: hairFloat 4s ease-in-out infinite;
+        }
+
+        .doll-face {
+            position: absolute;
+            width: 90px;
+            height: 110px;
+            background: linear-gradient(135deg, #fffacd, #fff8dc);
+            border-radius: 45% 45% 50% 50%;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 
+                0 5px 20px rgba(0,0,0,0.1),
+                inset 0 5px 15px rgba(255,255,255,0.9);
+        }
+
+        .doll-eyes {
+            position: absolute;
+            top: 35px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            z-index: 3;
+        }
+
+        .eye {
+            width: 18px;
+            height: 25px;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eye::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #1e90ff;
+            border-radius: 50%;
+            top: 7px;
+            left: 4px;
+            animation: blink 4s infinite;
+        }
+
+        .doll-mouth {
+            position: absolute;
+            width: 25px;
+            height: 12px;
+            background: var(--primary-pink);
+            border-radius: 0 0 12px 12px;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            animation: smile 5s infinite;
+        }
+
+        .doll-body {
+            position: absolute;
+            width: 90px;
+            height: 125px;
+            background: linear-gradient(135deg, var(--secondary-pink), #ff99cc);
+            border-radius: 40% 40% 30% 30%;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 
+                0 10px 25px rgba(255, 102, 204, 0.3),
+                inset 0 5px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .doll-dress {
+            position: absolute;
+            width: 110px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue), #ccffff);
+            border-radius: 40% 40% 20% 20%;
+            top: 145px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+            box-shadow: 0 10px 25px rgba(102, 204, 255, 0.3);
+        }
+
+        .doll-accessory {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            font-size: 24px;
+            animation: sparkle 2s infinite;
+        }
+
+        /* Doll Info */
+        .doll-info {
+            text-align: center;
+            width: 100%;
+        }
+
+        .doll-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .doll-title {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .mood-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 102, 204, 0.1);
+            padding: 8px 18px;
+            border-radius: 50px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 102, 204, 0.2);
+        }
+
+        .mood-emoji {
+            font-size: 1.6rem;
+            animation: bounce 2s infinite;
+        }
+
+        .mood-text {
+            font-weight: 600;
+            color: var(--primary-pink);
+        }
+
+        .doll-dialogue {
+            background: rgba(102, 204, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            border-left: 3px solid var(--primary-blue);
+            font-style: italic;
+            color: var(--text-light);
+            line-height: 1.4;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 102, 204, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon-small {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(102, 204, 255, 0.3);
+        }
+
+        .stat-name {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            flex: 1;
+        }
+
+        .stat-value-card {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Actions Grid */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .action-btn i {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 3px 10px rgba(102, 204, 255, 0.3);
+        }
+
+        .action-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .action-cost {
+            font-size: 0.75rem;
+            color: #ff9966;
+            font-weight: 600;
+        }
+
+        /* Shop Page */
+        .shop-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .category-btn {
+            padding: 8px 15px;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            color: white;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: rgba(255, 102, 204, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 102, 204, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .shop-item:active {
+            transform: scale(0.98);
+            background: rgba(255, 102, 204, 0.1);
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            box-shadow: 0 3px 10px rgba(102, 204, 255, 0.3);
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #ff9966;
+            font-size: 1rem;
+        }
+
+        .item-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .item-effects {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .effect-tag {
+            background: rgba(102, 204, 255, 0.1);
+            color: var(--primary-blue);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Quests Page */
+        .quests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quest-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid transparent;
+        }
+
+        .quest-card.daily {
+            border-left-color: var(--primary-pink);
+        }
+
+        .quest-card.achievement {
+            border-left-color: var(--accent-yellow);
+        }
+
+        .quest-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .quest-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .quest-info {
+            flex: 1;
+        }
+
+        .quest-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .quest-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .quest-reward {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .reward-badge {
+            background: rgba(102, 204, 255, 0.1);
+            color: var(--primary-blue);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quest-progress {
+            margin-top: 10px;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .complete-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        .complete-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Wardrobe Page */
+        .wardrobe-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .wardrobe-item {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .wardrobe-item.equipped {
+            border-color: var(--primary-pink);
+            background: rgba(255, 102, 204, 0.05);
+        }
+
+        .wardrobe-item.locked {
+            opacity: 0.5;
+            filter: grayscale(0.5);
+        }
+
+        .wardrobe-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 10px;
+        }
+
+        .wardrobe-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .wardrobe-status {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        .lock-icon {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Profile Page */
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            box-shadow: 0 5px 20px rgba(102, 204, 255, 0.3);
+        }
+
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .profile-level {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stat {
+            background: rgba(102, 204, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-label-profile {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .achievements {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .achievement-item {
+            text-align: center;
+        }
+
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin: 0 auto 8px;
+            box-shadow: 0 3px 10px rgba(102, 204, 255, 0.3);
+        }
+
+        .achievement-name {
+            font-size: 0.7rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .achievement-progress {
+            font-size: 0.6rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 10px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: #999;
+            transition: all 0.2s ease;
+            padding: 5px 10px;
+            border-radius: 10px;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-pink);
+            background: rgba(255, 102, 204, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            border-left: 4px solid var(--primary-pink);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .notification-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        .notification-message {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-pink) 0%, var(--primary-blue) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 30px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        @keyframes smile {
+            0%, 80%, 100% { height: 12px; }
+            85%, 95% { height: 8px; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes hairFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); }
+            50% { transform: translateX(-50%) translateY(-5px) rotate(2deg); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.7; transform: translateX(-50%) scale(1.1); }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translate(-50%, -50%); opacity: 1; }
+            100% { transform: translate(-50%, -150%); opacity: 0; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Hide scrollbars */
+        .page::-webkit-scrollbar,
+        .shop-categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .page,
+        .shop-categories {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Swipe Hint */
+        .swipe-hint {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #999;
+            font-size: 0.8rem;
+            animation: fadeInOut 2s infinite;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Achievement Popup */
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 1002;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 300px;
+            width: 90%;
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--primary-pink);
+        }
+
+        .achievement-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .popup-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 20px rgba(102, 204, 255, 0.3);
+            animation: bounce 1s infinite;
+        }
+
+        .popup-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .popup-desc {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .popup-reward {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, var(--primary-pink), var(--primary-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            width: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .popup-close:active {
+            transform: scale(0.98);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-height: 700px) {
+            .mobile-doll {
+                width: 150px;
+                height: 210px;
+            }
+            
+            .doll-hair {
+                width: 120px;
+                height: 75px;
+                top: 30px;
+            }
+            
+            .doll-face {
+                width: 75px;
+                height: 90px;
+                top: 60px;
+            }
+            
+            .doll-body {
+                width: 75px;
+                height: 100px;
+                top: 120px;
+            }
+            
+            .doll-dress {
+                width: 90px;
+                height: 70px;
+                top: 125px;
+            }
+            
+            .doll-name {
+                font-size: 1.5rem;
+            }
+            
+            .page {
+                padding-bottom: 80px;
+            }
+            
+            .bottom-nav {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .stats-cards,
+            .actions-grid,
+            .shop-items,
+            .wardrobe-grid,
+            .achievement-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop Warning -->
+    <div class="desktop-warning">
+        <div style="font-size: 3rem; margin-bottom: 20px;">📱</div>
+        <h1 style="font-size: 2rem; margin-bottom: 20px;">KERYVERSE</h1>
+        <p style="font-size: 1.2rem; max-width: 500px; line-height: 1.5;">
+            Эта версия игры разработана специально для мобильных устройств.
+            <br><br>
+            Пожалуйста, откройте игру на вашем смартфоне или планшете для наилучшего опыта.
+        </p>
+    </div>
+
+    <!-- Mobile App -->
+    <div class="mobile-app">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time" id="currentTime">14:30</div>
+            <div class="status-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-logo">KERYVERSE</div>
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification">
+            <div class="notification-header">
+                <div class="notification-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="notification-title">Добро пожаловать!</div>
+            </div>
+            <div class="notification-message">Керри рада видеть вас!</div>
+        </div>
+
+        <!-- Achievement Popup -->
+        <div class="achievement-popup" id="achievementPopup">
+            <div class="popup-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="popup-title" id="popupTitle">Достижение получено!</div>
+            <div class="popup-desc" id="popupDesc">Описание достижения</div>
+            <div class="popup-reward" id="popupReward">
+                <!-- Rewards will be added here -->
+            </div>
+            <button class="popup-close" onclick="closePopup()">Понятно</button>
+        </div>
+
+        <!-- Overlay -->
+        <div class="overlay" id="overlay" onclick="closePopup()"></div>
+
+        <!-- Page Container -->
+        <div class="page-container">
+            <!-- Home Page -->
+            <div class="page active" id="homePage">
+                <!-- Header -->
+                <div class="header">
+                    <div class="logo">KERYVERSE</div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-value" id="coinsStat">1,250</div>
+                        <div class="stat-label">Coins</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="stat-value" id="gemsStat">25</div>
+                        <div class="stat-label">Gems</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="stat-value" id="levelStat">12</div>
+                        <div class="stat-label">Level</div>
+                    </div>
+                </div>
+
+                <!-- Character Section -->
+                <div class="character-section">
+                    <div class="character-container">
+                        <div class="mobile-doll">
+                            <div class="doll-accessory" id="dollAccessory">👑</div>
+                            <div class="doll-hair"></div>
+                            <div class="doll-face">
+                                <div class="doll-eyes">
+                                    <div class="eye left"></div>
+                                    <div class="eye right"></div>
+                                </div>
+                                <div class="doll-mouth"></div>
+                            </div>
+                            <div class="doll-dress"></div>
+                            <div class="doll-body"></div>
+                        </div>
+                        
+                        <div class="doll-info">
+                            <div class="doll-name">Kerry</div>
+                            <div class="doll-title">Blonde Doll • Level 12</div>
+                            
+                            <div class="mood-display">
+                                <div class="mood-emoji" id="moodEmoji">💖</div>
+                                <div class="mood-text" id="moodText">Happy</div>
+                            </div>
+                            
+                            <div class="doll-dialogue" id="dialogueText">
+                                Привет! Я Керри, твоя куколка. Давай проведём день вместе!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-cards">
+                    <div class="stat-card" onclick="showStatDetails('health')">
+                        <div class="stat-header">
+                            <div class="stat-icon-small">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="stat-name">Health</div>
+                        </div>
+                        <div class="stat-value-card" id="healthValue">85%</div>
+                        <div class="progress-bar health-bar">
+                            <div class="progress-fill" id="healthBar" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card" onclick="showStatDetails('mood')">
+                        <div class="stat-header">
+                            <div class="stat-icon-small">
+                                <i class="fas fa-smile"></i>
+                            </div>
+                            <div class="stat-name">Mood</div>
+                        </div>
+                        <div class="stat-value-card" id="moodValue">92%</div>
+                        <div class="progress-bar mood-bar">
+                            <div class="progress-fill" id="moodBar" style="width: 92%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card" onclick="showStatDetails('energy')">
+                        <div class="stat-header">
+                            <div class="stat-icon-small">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="stat-name">Energy</div>
+                        </div>
+                        <div class="stat-value-card" id="energyValue">78%</div>
+                        <div class="progress-bar energy-bar">
+                            <div class="progress-fill" id="energyBar" style="width: 78%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card" onclick="showStatDetails('xp')">
+                        <div class="stat-header">
+                            <div class="stat-icon-small">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-name">Experience</div>
+                        </div>
+                        <div class="stat-value-card" id="xpValue">750/1000</div>
+                        <div class="progress-bar xp-bar">
+                            <div class="progress-fill" id="xpBar" style="width: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Grid -->
+                <div class="section-title" style="margin: 20px 0 10px 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-magic"></i>
+                    Actions
+                </div>
+                <div class="actions-grid">
+                    <button class="action-btn" onclick="performAction('feed')">
+                        <i class="fas fa-cookie-bite"></i>
+                        <div class="action-name">Feed</div>
+                        <div class="action-cost">-15 Coins</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="performAction('play')">
+                        <i class="fas fa-gamepad"></i>
+                        <div class="action-name">Play</div>
+                        <div class="action-cost">-5 Energy</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="performAction('beauty')">
+                        <i class="fas fa-spa"></i>
+                        <div class="action-name">Beauty</div>
+                        <div class="action-cost">-25 Coins</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="performAction('study')">
+                        <i class="fas fa-book"></i>
+                        <div class="action-name">Study</div>
+                        <div class="action-cost">-10 Energy</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="performAction('rest')">
+                        <i class="fas fa-bed"></i>
+                        <div class="action-name">Rest</div>
+                        <div class="action-cost">FREE</div>
+                    </button>
+                    
+                    <button class="action-btn" onclick="performAction('hug')">
+                        <i class="fas fa-heart"></i>
+                        <div class="action-name">Hug</div>
+                        <div class="action-cost">FREE</div>
+                    </button>
+                </div>
+
+                <!-- Swipe Hint -->
+                <div class="swipe-hint">
+                    <i class="fas fa-chevron-up"></i> Swipe up for more
+                </div>
+            </div>
+
+            <!-- Shop Page -->
+            <div class="page" id="shopPage">
+                <div class="header">
+                    <div class="logo">Shop</div>
+                </div>
+
+                <div class="shop-categories">
+                    <button class="category-btn active" onclick="changeCategory('all')">All</button>
+                    <button class="category-btn" onclick="changeCategory('dresses')">Dresses</button>
+                    <button class="category-btn" onclick="changeCategory('accessories')">Accessories</button>
+                    <button class="category-btn" onclick="changeCategory('consumables')">Consumables</button>
+                    <button class="category-btn" onclick="changeCategory('premium')">Premium</button>
+                </div>
+
+                <div class="shop-items">
+                    <!-- Items will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Quests Page -->
+            <div class="page" id="questsPage">
+                <div class="header">
+                    <div class="logo">Quests</div>
+                </div>
+
+                <div class="quests-list">
+                    <!-- Quests will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Wardrobe Page -->
+            <div class="page" id="wardrobePage">
+                <div class="header">
+                    <div class="logo">Wardrobe</div>
+                </div>
+
+                <div class="wardrobe-grid">
+                    <!-- Wardrobe items will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div class="page" id="profilePage">
+                <div class="header">
+                    <div class="logo">Profile</div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-name" id="playerName">Player</div>
+                    <div class="profile-level">Level <span id="profileLevel">12</span> • Member since 2024</div>
+                    
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="stat-number" id="playTime">45</div>
+                            <div class="stat-label-profile">Hours Played</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-number" id="questsCompleted">28</div>
+                            <div class="stat-label-profile">Quests Done</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-number" id="itemsBought">15</div>
+                            <div class="stat-label-profile">Items Bought</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-number" id="achievementsUnlocked">8</div>
+                            <div class="stat-label-profile">Achievements</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements">
+                    <div class="section-title" style="margin: 0 0 15px 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-trophy"></i>
+                        Achievements
+                    </div>
+                    <div class="achievement-grid">
+                        <!-- Achievements will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="switchTab('home')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('shop')">
+                <div class="nav-icon">🛍️</div>
+                <div class="nav-label">Shop</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('quests')">
+                <div class="nav-icon">🎯</div>
+                <div class="nav-label">Quests</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('wardrobe')">
+                <div class="nav-icon">👗</div>
+                <div class="nav-label">Wardrobe</div>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('profile')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        const gameState = {
+            // Basic stats
+            coins: 1250,
+            gems: 25,
+            level: 12,
+            xp: 750,
+            xpNeeded: 1000,
+            
+            // Doll stats
+            health: 85,
+            mood: 92,
+            energy: 78,
+            dollMood: 'happy',
+            
+            // Player stats
+            playerName: "Player",
+            playTime: 45,
+            questsCompleted: 28,
+            itemsBought: 15,
+            achievementsUnlocked: 8,
+            
+            // Wardrobe
+            wardrobe: {
+                accessories: ['crown'],
+                dresses: ['default'],
+                equipped: {
+                    accessory: 'crown',
+                    dress: 'default'
+                }
+            },
+            
+            // Achievements
+            achievements: {
+                firstLogin: { unlocked: true, progress: 1, required: 1 },
+                dollLover: { unlocked: true, progress: 50, required: 50 },
+                shopaholic: { unlocked: true, progress: 15, required: 10 },
+                questMaster: { unlocked: false, progress: 28, required: 50 },
+                millionaire: { unlocked: false, progress: 1250, required: 10000 },
+                perfectionist: { unlocked: false, progress: 0, required: 100 }
+            },
+            
+            // Daily quests
+            dailyQuests: {
+                feedDoll: { completed: false, progress: 0, required: 3 },
+                playGames: { completed: false, progress: 0, required: 5 },
+                buyItem: { completed: false, progress: 0, required: 1 }
+            },
+            
+            // Shop inventory
+            inventory: [],
+            
+            // Settings
+            lastLogin: Date.now(),
+            notifications: true,
+            music: true,
+            sound: true
+        };
+
+        // Game Data
+        const gameData = {
+            dialogues: [
+                "Привет! Я Керри, твоя куколка. Давай проведём день вместе! 💖",
+                "Сегодня отличный день для ухода за собой! ✨",
+                "Спасибо, что заботишься обо мне! Я так счастлива! 😊",
+                "Хочешь поиграть? У меня есть идеи для весёлых игр! 🎮",
+                "Красота требует ухода, но это так приятно! 💅",
+                "Я обожаю новые платья и аксессуары! 🛍️",
+                "Обнимашки делают день лучше! Давай обнимемся! 🤗",
+                "Ты лучший хозяин на свете! 🥰",
+                "Смотри, как я красива сегодня! 💃",
+                "Ура, новое платье! Спасибо тебе! 👗"
+            ],
+            
+            shopItems: {
+                all: [
+                    { id: 'dress1', name: 'Pink Dress', price: 120, type: 'dress', icon: '👗', effects: { mood: 15 }, description: 'Beautiful pink dress for Kerry' },
+                    { id: 'accessory1', name: 'Crown', price: 80, type: 'accessory', icon: '👑', effects: { health: 10 }, description: 'Sparkling crown accessory' },
+                    { id: 'guide', name: 'Beauty Guide', price: { gems: 2 }, type: 'consumable', icon: '📖', effects: { xp: 50 }, description: 'Premium beauty techniques' },
+                    { id: 'perfume', name: 'Perfume', price: 150, type: 'consumable', icon: '🌸', effects: { mood: 20 }, description: 'Lovely floral perfume' },
+                    { id: 'dress2', name: 'Blue Dress', price: 200, type: 'dress', icon: '👗', effects: { mood: 25, energy: 10 }, description: 'Elegant blue evening dress' },
+                    { id: 'accessory2', name: 'Earrings', price: 60, type: 'accessory', icon: '💎', effects: { mood: 10 }, description: 'Sparkling crystal earrings' },
+                    { id: 'snack', name: 'Special Snack', price: 50, type: 'consumable', icon: '🍰', effects: { health: 20, mood: 10 }, description: 'Delicious energy snack' },
+                    { id: 'theme', name: 'Theme Pack', price: { gems: 5 }, type: 'premium', icon: '🎨', effects: { xp: 100 }, description: 'Premium interface theme' }
+                ],
+                dresses: [],
+                accessories: [],
+                consumables: [],
+                premium: []
+            },
+            
+            quests: [
+                { id: 'daily1', title: 'Feed Kerry', description: 'Feed your doll 3 times today', type: 'daily', reward: { coins: 50, xp: 30 }, progress: 0, required: 3 },
+                { id: 'daily2', title: 'Play Time', description: 'Play with Kerry 5 times today', type: 'daily', reward: { coins: 30, xp: 40 }, progress: 0, required: 5 },
+                { id: 'daily3', title: 'Shopping Spree', description: 'Buy any item in the shop', type: 'daily', reward: { coins: 100, xp: 50 }, progress: 0, required: 1 },
+                { id: 'achievement1', title: 'Doll Lover', description: 'Interact with Kerry 50 times', type: 'achievement', reward: { gems: 5, xp: 200 }, progress: 50, required: 50 },
+                { id: 'achievement2', title: 'Quest Master', description: 'Complete 50 quests', type: 'achievement', reward: { gems: 10, xp: 500 }, progress: 28, required: 50 },
+                { id: 'achievement3', title: 'Millionaire', description: 'Collect 10,000 coins', type: 'achievement', reward: { gems: 20, xp: 1000 }, progress: 1250, required: 10000 }
+            ],
+            
+            wardrobeItems: [
+                { id: 'default_dress', name: 'Default Dress', type: 'dress', icon: '👗', equipped: true, unlocked: true },
+                { id: 'crown', name: 'Golden Crown', type: 'accessory', icon: '👑', equipped: true, unlocked: true },
+                { id: 'pink_dress', name: 'Pink Dress', type: 'dress', icon: '👗', equipped: false, unlocked: true },
+                { id: 'blue_dress', name: 'Blue Dress', type: 'dress', icon: '👗', equipped: false, unlocked: false, price: 200 },
+                { id: 'earrings', name: 'Crystal Earrings', type: 'accessory', icon: '💎', equipped: false, unlocked: false, price: 60 },
+                { id: 'ribbon', name: 'Silk Ribbon', type: 'accessory', icon: '🎀', equipped: false, unlocked: false, price: 40 },
+                { id: 'evening_gown', name: 'Evening Gown', type: 'dress', icon: '👗', equipped: false, unlocked: false, price: { gems: 3 } },
+                { id: 'tiara', name: 'Diamond Tiara', type: 'accessory', icon: '👑', equipped: false, unlocked: false, price: { gems: 2 } },
+                { id: 'summer_dress', name: 'Summer Dress', type: 'dress', icon: '👗', equipped: false, unlocked: false, price: 150 }
+            ],
+            
+            achievements: [
+                { id: 'firstLogin', name: 'First Steps', icon: '🚀', description: 'Start your journey', progress: '1/1' },
+                { id: 'dollLover', name: 'Doll Lover', icon: '💖', description: '50 interactions', progress: '50/50' },
+                { id: 'shopaholic', name: 'Shopaholic', icon: '🛍️', description: 'Buy 10 items', progress: '15/10' },
+                { id: 'questMaster', name: 'Quest Master', icon: '🎯', description: '50 quests done', progress: '28/50' },
+                { id: 'millionaire', name: 'Millionaire', icon: '💰', description: '10k coins', progress: '1250/10000' },
+                { id: 'perfectionist', name: 'Perfectionist', icon: '⭐', description: '100% in all stats', progress: '0/100' }
+            ],
+            
+            moodStates: {
+                ecstatic: { emoji: '💖', text: 'Ecstatic', min: 90, color: '#ff66cc' },
+                happy: { emoji: '😊', text: 'Happy', min: 70, color: '#ff99cc' },
+                good: { emoji: '🙂', text: 'Good', min: 50, color: '#ffcccc' },
+                okay: { emoji: '😐', text: 'Okay', min: 30, color: '#ccccff' },
+                sad: { emoji: '😔', text: 'Sad', min: 0, color: '#9999ff' }
+            }
+        };
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update time
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // Load game data
+            loadGame();
+            
+            // Initialize game data
+            initGameData();
+            
+            // Setup touch interactions
+            setupTouchInteractions();
+            
+            // Hide loading screen after 1.5 seconds
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    showNotification('Добро пожаловать в KERYVERSE!', 'Ваша куколка Керри ждёт заботы!');
+                    updateDialogue();
+                    
+                    // Check for new day
+                    checkNewDay();
+                    
+                    // Start auto stat decrease
+                    startAutoStatDecrease();
+                }, 500);
+            }, 1500);
+        });
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+
+        // Load game
+        function loadGame() {
+            const saved = localStorage.getItem('keryverse_save');
+            if (saved) {
+                try {
+                    const loaded = JSON.parse(saved);
+                    Object.assign(gameState, loaded);
+                    
+                    // Update last login time
+                    gameState.lastLogin = Date.now();
+                } catch (e) {
+                    console.error('Error loading save:', e);
+                }
+            }
+            
+            updateUI();
+            updateMoodDisplay();
+            loadShopItems();
+            loadQuests();
+            loadWardrobe();
+            loadAchievements();
+            updateProfile();
+        }
+
+        // Save game
+        function saveGame() {
+            try {
+                localStorage.setItem('keryverse_save', JSON.stringify(gameState));
+            } catch (e) {
+                console.error('Error saving game:', e);
+            }
+        }
+
+        // Initialize game data
+        function initGameData() {
+            // Organize shop items by category
+            gameData.shopItems.dresses = gameData.shopItems.all.filter(item => item.type === 'dress');
+            gameData.shopItems.accessories = gameData.shopItems.all.filter(item => item.type === 'accessory');
+            gameData.shopItems.consumables = gameData.shopItems.all.filter(item => item.type === 'consumable');
+            gameData.shopItems.premium = gameData.shopItems.all.filter(item => item.type === 'premium');
+        }
+
+        // Update UI
+        function updateUI() {
+            // Update stats bar
+            document.getElementById('coinsStat').textContent = gameState.coins.toLocaleString();
+            document.getElementById('gemsStat').textContent = gameState.gems;
+            document.getElementById('levelStat').textContent = gameState.level;
+            
+            // Update stat cards
+            document.getElementById('healthValue').textContent = `${Math.round(gameState.health)}%`;
+            document.getElementById('moodValue').textContent = `${Math.round(gameState.mood)}%`;
+            document.getElementById('energyValue').textContent = `${Math.round(gameState.energy)}%`;
+            document.getElementById('xpValue').textContent = `${Math.round(gameState.xp)}/${gameState.xpNeeded}`;
+            
+            // Update progress bars
+            document.getElementById('healthBar').style.width = `${gameState.health}%`;
+            document.getElementById('moodBar').style.width = `${gameState.mood}%`;
+            document.getElementById('energyBar').style.width = `${gameState.energy}%`;
+            document.getElementById('xpBar').style.width = `${(gameState.xp / gameState.xpNeeded) * 100}%`;
+        }
+
+        // Update mood display
+        function updateMoodDisplay() {
+            const moodEmoji = document.getElementById('moodEmoji');
+            const moodText = document.getElementById('moodText');
+            const mouth = document.querySelector('.doll-mouth');
+            
+            // Determine mood state
+            let currentMood = 'sad';
+            for (const [state, data] of Object.entries(gameData.moodStates)) {
+                if (gameState.mood >= data.min) {
+                    currentMood = state;
+                    break;
+                }
+            }
+            
+            const moodData = gameData.moodStates[currentMood];
+            moodEmoji.textContent = moodData.emoji;
+            moodText.textContent = moodData.text;
+            mouth.style.background = moodData.color;
+            gameState.dollMood = currentMood;
+            
+            // Reset mouth shape for sad mood
+            if (currentMood === 'sad') {
+                mouth.style.borderRadius = '15px 15px 0 0';
+                mouth.style.transform = 'translateX(-50%) rotate(180deg)';
+            } else {
+                mouth.style.borderRadius = '0 0 15px 15px';
+                mouth.style.transform = 'translateX(-50%)';
+            }
+        }
+
+        // Update dialogue
+        function updateDialogue(customText) {
+            const dialogue = document.getElementById('dialogueText');
+            dialogue.style.opacity = '0';
+            
+            setTimeout(() => {
+                dialogue.textContent = customText || gameData.dialogues[Math.floor(Math.random() * gameData.dialogues.length)];
+                dialogue.style.opacity = '1';
+            }, 200);
+        }
+
+        // Update profile
+        function updateProfile() {
+            document.getElementById('playerName').textContent = gameState.playerName;
+            document.getElementById('profileLevel').textContent = gameState.level;
+            document.getElementById('playTime').textContent = gameState.playTime;
+            document.getElementById('questsCompleted').textContent = gameState.questsCompleted;
+            document.getElementById('itemsBought').textContent = gameState.itemsBought;
+            document.getElementById('achievementsUnlocked').textContent = gameState.achievementsUnlocked;
+        }
+
+        // Setup touch interactions
+        function setupTouchInteractions() {
+            // Touch feedback for buttons
+            document.querySelectorAll('.action-btn, .shop-item, .nav-item, .category-btn').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.8';
+                });
+                
+                btn.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+            
+            // Doll touch interaction
+            document.querySelector('.mobile-doll').addEventListener('click', function() {
+                const reactions = [
+                    "Ой, щекотно! 😄",
+                    "Мне нравятся твои прикосновения! 💕",
+                    "Ты делаешь меня счастливой! ✨",
+                    "Давай обнимемся! 🤗",
+                    "Ты лучший хозяин! 🥰",
+                    "Ура, внимание! 🎉"
+                ];
+                
+                updateDialogue(reactions[Math.floor(Math.random() * reactions.length)]);
+                increaseMood(3);
+                createTouchEffect();
+                
+                // Update interaction achievement
+                if (gameState.achievements.dollLover.progress < 1000) {
+                    gameState.achievements.dollLover.progress++;
+                    if (gameState.achievements.dollLover.progress >= 50 && !gameState.achievements.dollLover.unlocked) {
+                        unlockAchievement('dollLover', 'Doll Lover', 'Interact with Kerry 50 times');
+                    }
+                }
+                
+                saveGame();
+            });
+        }
+
+        // Perform action
+        function performAction(action) {
+            let success = false;
+            let message = '';
+            let reward = {};
+            
+            switch(action) {
+                case 'feed':
+                    if (gameState.coins >= 15) {
+                        gameState.coins -= 15;
+                        gameState.health = Math.min(100, gameState.health + 10);
+                        gameState.mood = Math.min(100, gameState.mood + 8);
+                        gameState.xp += 20;
+                        gameState.dailyQuests.feedDoll.progress++;
+                        success = true;
+                        message = 'Керри покормлена!';
+                        reward = { health: 10, mood: 8, xp: 20, coins: -15 };
+                        
+                        // Check quest completion
+                        if (gameState.dailyQuests.feedDoll.progress >= 3 && !gameState.dailyQuests.feedDoll.completed) {
+                            completeQuest('daily1');
+                        }
+                    } else {
+                        showNotification('Недостаточно монет!', 'Нужно 15 монет', 'error');
+                    }
+                    break;
+                    
+                case 'play':
+                    if (gameState.energy >= 5) {
+                        gameState.energy -= 5;
+                        gameState.mood = Math.min(100, gameState.mood + 15);
+                        gameState.xp += 25;
+                        gameState.dailyQuests.playGames.progress++;
+                        success = true;
+                        message = 'Весело поиграли!';
+                        reward = { mood: 15, xp: 25, energy: -5 };
+                        
+                        // Check quest completion
+                        if (gameState.dailyQuests.playGames.progress >= 5 && !gameState.dailyQuests.playGames.completed) {
+                            completeQuest('daily2');
+                        }
+                    } else {
+                        showNotification('Мало энергии!', 'Керри устала', 'warning');
+                    }
+                    break;
+                    
+                case 'beauty':
+                    if (gameState.coins >= 25) {
+                        gameState.coins -= 25;
+                        gameState.mood = Math.min(100, gameState.mood + 20);
+                        gameState.xp += 35;
+                        success = true;
+                        message = 'Уход завершён!';
+                        reward = { mood: 20, xp: 35, coins: -25 };
+                    } else {
+                        showNotification('Недостаточно монет!', 'Нужно 25 монет', 'error');
+                    }
+                    break;
+                    
+                case 'study':
+                    if (gameState.energy >= 10) {
+                        gameState.energy -= 10;
+                        gameState.xp += 40;
+                        success = true;
+                        message = 'Урок завершён!';
+                        reward = { xp: 40, energy: -10 };
+                    } else {
+                        showNotification('Мало энергии!', 'Нужно отдохнуть', 'warning');
+                    }
+                    break;
+                    
+                case 'rest':
+                    gameState.energy = Math.min(100, gameState.energy + 25);
+                    gameState.health = Math.min(100, gameState.health + 5);
+                    success = true;
+                    message = 'Керри отдохнула!';
+                    reward = { energy: 25, health: 5 };
+                    break;
+                    
+                case 'hug':
+                    increaseMood(10);
+                    success = true;
+                    message = 'Обнимашки!';
+                    reward = { mood: 10 };
+                    break;
+            }
+            
+            if (success) {
+                showNotification(message, getRewardText(reward));
+                updateDialogue(getActionDialogue(action));
+                checkLevelUp();
+                updateUI();
+                updateMoodDisplay();
+                saveGame();
+                createActionEffect(event.currentTarget);
+            }
+        }
+
+        // Get reward text
+        function getRewardText(reward) {
+            const parts = [];
+            if (reward.coins) parts.push(`${reward.coins > 0 ? '+' : ''}${reward.coins} Coins`);
+            if (reward.gems) parts.push(`${reward.gems > 0 ? '+' : ''}${reward.gems} Gems`);
+            if (reward.health) parts.push(`${reward.health > 0 ? '+' : ''}${reward.health} Health`);
+            if (reward.mood) parts.push(`${reward.mood > 0 ? '+' : ''}${reward.mood} Mood`);
+            if (reward.energy) parts.push(`${reward.energy > 0 ? '+' : ''}${reward.energy} Energy`);
+            if (reward.xp) parts.push(`${reward.xp > 0 ? '+' : ''}${reward.xp} XP`);
+            return parts.join(', ');
+        }
+
+        // Get action dialogue
+        function getActionDialogue(action) {
+            const dialogues = {
+                feed: ["Вкусно! Спасибо за еду! 🍰", "Ммм, как вкусно! 😋", "Я наелась! Спасибо! 🥰"],
+                play: ["Было так весело! Давай ещё! 🎮", "Ура, играем! 🎲", "Как же весело! 😄"],
+                beauty: ["Я чувствую себя прекрасно! 💅", "Теперь я ещё красивее! ✨", "Спасибо за уход! 💖"],
+                study: ["Я узнала много нового! 📚", "Образование важно! 🎓", "Теперь я умнее! 🧠"],
+                rest: ["Я выспалась и полна сил! 💤", "Как хорошо отдохнуть! 😴", "Спасибо за отдых! 🌙"],
+                hug: ["Обнимашки самые лучшие! 🤗", "Мне так тепло и хорошо! 💕", "Ещё обнимашек! 🥰"]
+            };
+            
+            const list = dialogues[action] || ["Спасибо тебе! 💖"];
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        // Increase mood
+        function increaseMood(amount) {
+            gameState.mood = Math.min(100, gameState.mood + amount);
+            updateMoodDisplay();
+            updateUI();
+        }
+
+        // Check level up
+        function checkLevelUp() {
+            if (gameState.xp >= gameState.xpNeeded) {
+                gameState.level++;
+                gameState.xp -= gameState.xpNeeded;
+                gameState.xpNeeded = Math.floor(gameState.xpNeeded * 1.2);
+                gameState.coins += gameState.level * 50;
+                gameState.gems += 1;
+                
+                showNotification('Уровень повышен!', `Теперь уровень ${gameState.level}! Награда: +${gameState.level * 50} Coins, +1 Gem`);
+                updateDialogue(`Ура! Я достигла ${gameState.level} уровня! 🎉`);
+                createLevelUpEffect();
+                updateProfile();
+                saveGame();
+                
+                // Check achievement
+                if (gameState.level >= 10) {
+                    // Achievement for reaching level 10
+                }
+            }
+        }
+
+        // Load shop items
+        function loadShopItems(category = 'all') {
+            const container = document.querySelector('#shopPage .shop-items');
+            const items = gameData.shopItems[category] || gameData.shopItems.all;
+            
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const isOwned = gameState.inventory.includes(item.id);
+                const canAfford = typeof item.price === 'object' 
+                    ? gameState.gems >= item.price.gems
+                    : gameState.coins >= item.price;
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = `shop-item ${isOwned ? 'owned' : ''} ${!canAfford && !isOwned ? 'locked' : ''}`;
+                itemEl.onclick = () => !isOwned && canAfford && buyItem(item.id);
+                
+                const priceHTML = typeof item.price === 'object'
+                    ? `<div class="item-price">${item.price.gems} <i class="fas fa-gem"></i></div>`
+                    : `<div class="item-price">${item.price}</div>`;
+                
+                const effectsHTML = Object.entries(item.effects || {})
+                    .map(([stat, value]) => `
+                        <span class="effect-tag">
+                            <i class="fas fa-${getStatIcon(stat)}"></i> +${value} ${stat.toUpperCase()}
+                        </span>
+                    `).join('');
+                
+                itemEl.innerHTML = `
+                    <div class="item-header">
+                        <div class="item-icon">${item.icon}</div>
+                        <div class="item-name">${item.name}</div>
+                        ${priceHTML}
+                    </div>
+                    <div class="item-desc">${item.description}</div>
+                    <div class="item-effects">${effectsHTML}</div>
+                    ${isOwned ? '<div class="item-status" style="color: var(--success); font-size: 0.8rem; margin-top: 5px;">✓ Owned</div>' : ''}
+                `;
+                
+                container.appendChild(itemEl);
+            });
+        }
+
+        // Get stat icon
+        function getStatIcon(stat) {
+            const icons = {
+                health: 'heart',
+                mood: 'smile',
+                energy: 'bolt',
+                xp: 'star'
+            };
+            return icons[stat] || 'star';
+        }
+
+        // Buy item
+        function buyItem(itemId) {
+            const item = gameData.shopItems.all.find(i => i.id === itemId);
+            if (!item) return;
+            
+            // Check price
+            let canAfford = false;
+            if (typeof item.price === 'object') {
+                if (gameState.gems >= item.price.gems) {
+                    gameState.gems -= item.price.gems;
+                    canAfford = true;
+                }
+            } else {
+                if (gameState.coins >= item.price) {
+                    gameState.coins -= item.price;
+                    canAfford = true;
+                }
+            }
+            
+            if (!canAfford) {
+                showNotification('Недостаточно средств!', typeof item.price === 'object' ? `Нужно ${item.price.gems} алмазов` : `Нужно ${item.price} монет`, 'error');
+                return;
+            }
+            
+            // Add to inventory
+            if (!gameState.inventory.includes(itemId)) {
+                gameState.inventory.push(itemId);
+            }
+            
+            // Apply effects
+            if (item.effects) {
+                Object.entries(item.effects).forEach(([stat, value]) => {
+                    if (stat === 'health') gameState.health = Math.min(100, gameState.health + value);
+                    if (stat === 'mood') gameState.mood = Math.min(100, gameState.mood + value);
+                    if (stat === 'energy') gameState.energy = Math.min(100, gameState.energy + value);
+                    if (stat === 'xp') gameState.xp += value;
+                });
+            }
+            
+            // Update stats
+            gameState.itemsBought++;
+            gameState.dailyQuests.buyItem.progress = 1;
+            gameState.achievements.shopaholic.progress++;
+            
+            // Check quest completion
+            if (!gameState.dailyQuests.buyItem.completed) {
+                completeQuest('daily3');
+            }
+            
+            // Check achievement
+            if (gameState.achievements.shopaholic.progress >= 10 && !gameState.achievements.shopaholic.unlocked) {
+                unlockAchievement('shopaholic', 'Shopaholic', 'Buy 10 items in the shop');
+            }
+            
+            // Show notification
+            showNotification('Покупка совершена!', `${item.name} добавлен в инвентарь!`);
+            updateDialogue("Спасибо за подарок! Я обожаю его! 🎁");
+            
+            // Update UI
+            updateUI();
+            updateMoodDisplay();
+            loadShopItems(getCurrentCategory());
+            saveGame();
+            createPurchaseEffect();
+            
+            // Check level up
+            checkLevelUp();
+        }
+
+        // Get current category
+        function getCurrentCategory() {
+            const activeBtn = document.querySelector('.category-btn.active');
+            return activeBtn ? activeBtn.onclick.toString().match(/changeCategory\('(\w+)'\)/)[1] : 'all';
+        }
+
+        // Change category
+        function changeCategory(category) {
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Load items for category
+            loadShopItems(category);
+        }
+
+        // Load quests
+        function loadQuests() {
+            const container = document.querySelector('#questsPage .quests-list');
+            container.innerHTML = '';
+            
+            gameData.quests.forEach(quest => {
+                const isDaily = quest.type === 'daily';
+                const progress = isDaily 
+                    ? gameState.dailyQuests[quest.id.replace('daily', '').toLowerCase()]?.progress || 0
+                    : gameState.achievements[quest.id]?.progress || 0;
+                
+                const completed = isDaily
+                    ? gameState.dailyQuests[quest.id.replace('daily', '').toLowerCase()]?.completed || false
+                    : gameState.achievements[quest.id]?.unlocked || false;
+                
+                const questEl = document.createElement('div');
+                questEl.className = `quest-card ${quest.type} ${completed ? 'completed' : ''}`;
+                
+                const rewardHTML = Object.entries(quest.reward || {})
+                    .map(([type, value]) => `
+                        <div class="reward-badge">
+                            <i class="fas fa-${type === 'coins' ? 'coins' : type === 'gems' ? 'gem' : 'star'}"></i>
+                            +${value}
+                        </div>
+                    `).join('');
+                
+                questEl.innerHTML = `
+                    <div class="quest-header">
+                        <div class="quest-icon">
+                            <i class="fas fa-${isDaily ? 'calendar-day' : 'trophy'}"></i>
+                        </div>
+                        <div class="quest-info">
+                            <div class="quest-title">${quest.title}</div>
+                            <div class="quest-desc">${quest.description}</div>
+                        </div>
+                    </div>
+                    <div class="quest-reward">
+                        ${rewardHTML}
+                    </div>
+                    <div class="quest-progress">
+                        <div class="progress-text">
+                            <span>Progress</span>
+                            <span>${progress}/${quest.required}</span>
+                        </div>
+                        <div class="progress-bar" style="background: rgba(0,0,0,0.05); height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div class="progress-fill" style="width: ${(progress / quest.required) * 100}%; background: ${isDaily ? 'var(--primary-pink)' : 'var(--accent-yellow)'}; height: 100%;"></div>
+                        </div>
+                    </div>
+                    ${!completed && progress >= quest.required ? 
+                        `<button class="complete-btn" onclick="completeQuest('${quest.id}')">Complete</button>` : 
+                        completed ? 
+                        `<div style="text-align: center; color: var(--success); font-size: 0.9rem; margin-top: 10px;">✓ Completed</div>` :
+                        ''
+                    }
+                `;
+                
+                container.appendChild(questEl);
+            });
+        }
+
+        // Complete quest
+        function completeQuest(questId) {
+            const quest = gameData.quests.find(q => q.id === questId);
+            if (!quest) return;
+            
+            const isDaily = quest.type === 'daily';
+            
+            if (isDaily) {
+                // Daily quest
+                const questKey = questId.replace('daily', '').toLowerCase();
+                if (gameState.dailyQuests[questKey] && !gameState.dailyQuests[questKey].completed) {
+                    gameState.dailyQuests[questKey].completed = true;
+                    
+                    // Give rewards
+                    if (quest.reward.coins) gameState.coins += quest.reward.coins;
+                    if (quest.reward.gems) gameState.gems += quest.reward.gems;
+                    if (quest.reward.xp) gameState.xp += quest.reward.xp;
+                    
+                    // Update stats
+                    gameState.questsCompleted++;
+                    
+                    showNotification('Задание выполнено!', `Награда: ${getRewardText(quest.reward)}`);
+                    loadQuests();
+                    updateUI();
+                    saveGame();
+                    createQuestCompleteEffect();
+                    
+                    // Check level up
+                    checkLevelUp();
+                    
+                    // Check achievement
+                    gameState.achievements.questMaster.progress++;
+                    if (gameState.achievements.questMaster.progress >= 50 && !gameState.achievements.questMaster.unlocked) {
+                        unlockAchievement('questMaster', 'Quest Master', 'Complete 50 quests');
+                    }
+                }
+            } else {
+                // Achievement quest
+                if (gameState.achievements[questId] && !gameState.achievements[questId].unlocked) {
+                    gameState.achievements[questId].unlocked = true;
+                    
+                    // Give rewards
+                    if (quest.reward.coins) gameState.coins += quest.reward.coins;
+                    if (quest.reward.gems) gameState.gems += quest.reward.gems;
+                    if (quest.reward.xp) gameState.xp += quest.reward.xp;
+                    
+                    // Update stats
+                    gameState.achievementsUnlocked++;
+                    gameState.questsCompleted++;
+                    
+                    showNotification('Достижение разблокировано!', `${quest.title}: ${getRewardText(quest.reward)}`);
+                    loadQuests();
+                    loadAchievements();
+                    updateUI();
+                    updateProfile();
+                    saveGame();
+                    createAchievementEffect();
+                    
+                    // Check level up
+                    checkLevelUp();
+                }
+            }
+        }
+
+        // Load wardrobe
+        function loadWardrobe() {
+            const container = document.querySelector('#wardrobePage .wardrobe-grid');
+            container.innerHTML = '';
+            
+            gameData.wardrobeItems.forEach(item => {
+                const isUnlocked = item.unlocked || gameState.inventory.includes(item.id) || gameState.wardrobe[item.type + 's']?.includes(item.id);
+                const isEquipped = gameState.wardrobe.equipped[item.type] === item.id;
+                
+                const itemEl = document.createElement('div');
+                itemEl.className = `wardrobe-item ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked' : ''}`;
+                itemEl.onclick = () => {
+                    if (isUnlocked) {
+                        equipItem(item.id, item.type);
+                    } else if (item.price) {
+                        showBuyWardrobePopup(item);
+                    }
+                };
+                
+                const statusHTML = !isUnlocked ? 
+                    `<div class="wardrobe-status">${typeof item.price === 'object' ? `${item.price.gems} gems` : `${item.price} coins`}</div>` :
+                    `<div class="wardrobe-status">${isEquipped ? 'Equipped' : 'Owned'}</div>`;
+                
+                const lockHTML = !isUnlocked ? `<div class="lock-icon"><i class="fas fa-lock"></i></div>` : '';
+                
+                itemEl.innerHTML = `
+                    <div class="wardrobe-icon">${item.icon}</div>
+                    <div class="wardrobe-name">${item.name}</div>
+                    ${statusHTML}
+                    ${lockHTML}
+                `;
+                
+                container.appendChild(itemEl);
+            });
+        }
+
+        // Equip item
+        function equipItem(itemId, type) {
+            gameState.wardrobe.equipped[type] = itemId;
+            
+            // Update doll appearance
+            const accessoryEl = document.getElementById('dollAccessory');
+            if (type === 'accessory') {
+                const item = gameData.wardrobeItems.find(i => i.id === itemId);
+                if (item) {
+                    accessoryEl.textContent = item.icon;
+                }
+            }
+            
+            showNotification('Экипировано!', 'Новый вид сохранён');
+            loadWardrobe();
+            saveGame();
+        }
+
+        // Show buy wardrobe popup
+        function showBuyWardrobePopup(item) {
+            const canAfford = typeof item.price === 'object' 
+                ? gameState.gems >= item.price.gems
+                : gameState.coins >= item.price;
+            
+            if (!canAfford) {
+                showNotification('Недостаточно средств!', typeof item.price === 'object' ? `Нужно ${item.price.gems} алмазов` : `Нужно ${item.price} монет`, 'error');
+                return;
+            }
+            
+            if (confirm(`Купить ${item.name} за ${typeof item.price === 'object' ? `${item.price.gems} алмазов` : `${item.price} монет`}?`)) {
+                // Deduct price
+                if (typeof item.price === 'object') {
+                    gameState.gems -= item.price.gems;
+                } else {
+                    gameState.coins -= item.price;
+                }
+                
+                // Unlock item
+                item.unlocked = true;
+                
+                // Add to wardrobe
+                if (!gameState.wardrobe[item.type + 's'].includes(item.id)) {
+                    gameState.wardrobe[item.type + 's'].push(item.id);
+                }
+                
+                // Update inventory
+                if (!gameState.inventory.includes(item.id)) {
+                    gameState.inventory.push(item.id);
+                }
+                
+                showNotification('Приобретено!', `${item.name} добавлен в гардероб`);
+                loadWardrobe();
+                updateUI();
+                saveGame();
+            }
+        }
+
+        // Load achievements
+        function loadAchievements() {
+            const container = document.querySelector('#profilePage .achievement-grid');
+            container.innerHTML = '';
+            
+            gameData.achievements.forEach(achievement => {
+                const achievementData = gameState.achievements[achievement.id];
+                const isUnlocked = achievementData?.unlocked || false;
+                
+                const achievementEl = document.createElement('div');
+                achievementEl.className = 'achievement-item';
+                achievementEl.onclick = () => showAchievementDetails(achievement.id);
+                
+                achievementEl.innerHTML = `
+                    <div class="achievement-icon" style="${!isUnlocked ? 'filter: grayscale(1); opacity: 0.5;' : ''}">
+                        ${achievement.icon}
+                    </div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-progress">${achievement.progress}</div>
+                `;
+                
+                container.appendChild(achievementEl);
+            });
+        }
+
+        // Show achievement details
+        function showAchievementDetails(achievementId) {
+            const achievement = gameData.achievements.find(a => a.id === achievementId);
+            const data = gameState.achievements[achievementId];
+            
+            if (!achievement || !data) return;
+            
+            showNotification(
+                achievement.name,
+                `${achievement.description}\nПрогресс: ${data.progress}/${data.required || 1}`,
+                data.unlocked ? 'success' : 'info'
+            );
+        }
+
+        // Unlock achievement
+        function unlockAchievement(id, title, description) {
+            const achievement = gameState.achievements[id];
+            if (!achievement || achievement.unlocked) return;
+            
+            achievement.unlocked = true;
+            gameState.achievementsUnlocked++;
+            
+            // Show achievement popup
+            showAchievementPopup(title, description, { gems: 5, xp: 100 });
+            
+            // Update profile
+            updateProfile();
+            loadAchievements();
+            saveGame();
+        }
+
+        // Show achievement popup
+        function showAchievementPopup(title, description, reward) {
+            const popup = document.getElementById('achievementPopup');
+            const overlay = document.getElementById('overlay');
+            const titleEl = document.getElementById('popupTitle');
+            const descEl = document.getElementById('popupDesc');
+            const rewardEl = document.getElementById('popupReward');
+            
+            titleEl.textContent = title;
+            descEl.textContent = description;
+            
+            // Create reward HTML
+            let rewardHTML = '';
+            if (reward.coins) {
+                rewardHTML += `<div class="reward-item"><i class="fas fa-coins"></i> ${reward.coins}</div>`;
+                gameState.coins += reward.coins;
+            }
+            if (reward.gems) {
+                rewardHTML += `<div class="reward-item"><i class="fas fa-gem"></i> ${reward.gems}</div>`;
+                gameState.gems += reward.gems;
+            }
+            if (reward.xp) {
+                rewardHTML += `<div class="reward-item"><i class="fas fa-star"></i> ${reward.xp}</div>`;
+                gameState.xp += reward.xp;
+            }
+            
+            rewardEl.innerHTML = rewardHTML;
+            
+            // Show popup
+            popup.classList.add('show');
+            overlay.classList.add('show');
+            
+            // Update UI
+            updateUI();
+            
+            // Check level up
+            checkLevelUp();
+        }
+
+        // Close popup
+        function closePopup() {
+            document.getElementById('achievementPopup').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // Show stat details
+        function showStatDetails(stat) {
+            const statNames = {
+                health: 'Здоровье',
+                mood: 'Настроение',
+                energy: 'Энергия',
+                xp: 'Опыт'
+            };
+            
+            const statDescriptions = {
+                health: 'Здоровье Керри. Уменьшается со временем. Восстанавливается с помощью еды и отдыха.',
+                mood: 'Настроение Керри. Влияет на её поведение и диалоги. Повышается при взаимодействии.',
+                energy: 'Энергия Керри. Тратится на активные действия. Восстанавливается отдыхом.',
+                xp: 'Опыт Керри. Накапливается при взаимодействии. При достижении максимума повышается уровень.'
+            };
+            
+            showNotification(statNames[stat], statDescriptions[stat], 'info');
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const pageId = `${tab}Page`;
+            document.getElementById(pageId).classList.add('active');
+            
+            // Load page content if needed
+            switch(tab) {
+                case 'shop':
+                    loadShopItems();
+                    break;
+                case 'quests':
+                    loadQuests();
+                    break;
+                case 'wardrobe':
+                    loadWardrobe();
+                    break;
+                case 'profile':
+                    loadAchievements();
+                    break;
+            }
+            
+            // Scroll to top
+            document.getElementById(pageId).scrollTop = 0;
+        }
+
+        // Show notification
+        function showNotification(title, message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = notification.querySelector('.notification-icon i');
+            const titleEl = notification.querySelector('.notification-title');
+            const messageEl = notification.querySelector('.notification-message');
+            
+            // Set icon based on type
+            switch(type) {
+                case 'success':
+                    icon.className = 'fas fa-check';
+                    notification.style.borderLeftColor = 'var(--success)';
+                    break;
+                case 'error':
+                    icon.className = 'fas fa-times';
+                    notification.style.borderLeftColor = 'var(--error)';
+                    break;
+                case 'warning':
+                    icon.className = 'fas fa-exclamation';
+                    notification.style.borderLeftColor = 'var(--warning)';
+                    break;
+                case 'info':
+                    icon.className = 'fas fa-info';
+                    notification.style.borderLeftColor = 'var(--primary-blue)';
+                    break;
+            }
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Check new day
+        function checkNewDay() {
+            const lastLogin = new Date(gameState.lastLogin);
+            const now = new Date();
+            
+            // Reset daily quests if new day
+            if (lastLogin.getDate() !== now.getDate() || 
+                lastLogin.getMonth() !== now.getMonth() || 
+                lastLogin.getFullYear() !== now.getFullYear()) {
+                
+                // Reset daily quests
+                Object.keys(gameState.dailyQuests).forEach(key => {
+                    gameState.dailyQuests[key].completed = false;
+                    gameState.dailyQuests[key].progress = 0;
+                });
+                
+                showNotification('Новый день!', 'Ежедневные задания обновлены!');
+                loadQuests();
+                saveGame();
+            }
+        }
+
+        // Start auto stat decrease
+        function startAutoStatDecrease() {
+            setInterval(() => {
+                if (gameState.health > 20) gameState.health -= 0.2;
+                if (gameState.mood > 20) gameState.mood -= 0.3;
+                if (gameState.energy > 20) gameState.energy -= 0.4;
+                
+                updateUI();
+                updateMoodDisplay();
+                saveGame();
+                
+                // Check for low stats
+                if (gameState.health < 30 || gameState.mood < 30 || gameState.energy < 30) {
+                    const lowStats = [];
+                    if (gameState.health < 30) lowStats.push('здоровье');
+                    if (gameState.mood < 30) lowStats.push('настроение');
+                    if (gameState.energy < 30) lowStats.push('энергия');
+                    
+                    if (lowStats.length > 0) {
+                        updateDialogue(`Моё ${lowStats.join(', ')} на низком уровне! Пожалуйста, позаботься обо мне! 😟`);
+                    }
+                }
+            }, 60000); // Every minute
+        }
+
+        // Create effects
+        function createTouchEffect() {
+            const doll = document.querySelector('.mobile-doll');
+            const hearts = ['💖', '💕', '💗', '💓', '💞'];
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.position = 'absolute';
+                    heart.style.fontSize = '20px';
+                    heart.style.left = `${30 + Math.random() * 40}%`;
+                    heart.style.top = '50%';
+                    heart.style.transform = 'translate(-50%, -50%)';
+                    heart.style.opacity = '0';
+                    heart.style.zIndex = '100';
+                    heart.style.animation = `floatUp 1s ease-out forwards`;
+                    
+                    doll.appendChild(heart);
+                    setTimeout(() => heart.remove(), 1000);
+                }, i * 100);
+            }
+        }
+
+        function createActionEffect(element) {
+            element.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                element.style.transform = '';
+            }, 200);
+            
+            // Create sparkle effect
+            const rect = element.getBoundingClientRect();
+            createSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+
+        function createPurchaseEffect() {
+            createSparkles(window.innerWidth / 2, window.innerHeight / 2);
+        }
+
+        function createQuestCompleteEffect() {
+            createSparkles(window.innerWidth / 2, 200, '✨', 10);
+        }
+
+        function createAchievementEffect() {
+            createSparkles(window.innerWidth / 2, 300, '🏆', 15);
+        }
+
+        function createLevelUpEffect() {
+            createSparkles(window.innerWidth / 2, window.innerHeight / 2, '🌟', 20);
+        }
+
+        function createSparkles(x, y, emoji = '✨', count = 5) {
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.textContent = emoji;
+                    sparkle.style.position = 'fixed';
+                    sparkle.style.fontSize = '25px';
+                    sparkle.style.left = `${x - 15}px`;
+                    sparkle.style.top = `${y - 15}px`;
+                    sparkle.style.opacity = '0';
+                    sparkle.style.zIndex = '1000';
+                    sparkle.style.pointerEvents = 'none';
+                    sparkle.style.animation = `sparkleFloat 1s ease-out forwards`;
+                    
+                    document.body.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 1000);
+                }, i * 100);
+            }
+            
+            // Add animation if not exists
+            if (!document.querySelector('#sparkleFloat')) {
+                const style = document.createElement('style');
+                style.id = 'sparkleFloat';
+                style.textContent = `
+                    @keyframes sparkleFloat {
+                        0% { 
+                            transform: translate(0, 0) scale(0.5) rotate(0deg); 
+                            opacity: 0; 
+                        }
+                        20% { 
+                            opacity: 1; 
+                        }
+                        100% { 
+                            transform: translate(${Math.random() * 100 - 50}px, -100px) scale(1) rotate(360deg); 
+                            opacity: 0; 
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Connect Telegram (placeholder)
+        function connectTelegram() {
+            showNotification('Telegram', 'Эта функция будет доступна в следующем обновлении!', 'info');
+        }
+
+        // Export game data
+        function exportGameData() {
+            const data = JSON.stringify(gameState, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'keryverse_save.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Сохранение экспортировано!', 'Файл сохранения загружен', 'success');
+        }
+
+        // Import game data
+        function importGameData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function() {
+                    try {
+                        const data = JSON.parse(reader.result);
+                        Object.assign(gameState, data);
+                        loadGame();
+                        showNotification('Сохранение загружено!', 'Игра восстановлена', 'success');
+                    } catch (err) {
+                        showNotification('Ошибка!', 'Неверный файл сохранения', 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Reset game
+        function resetGame() {
+            if (confirm('Вы уверены? Это сбросит весь прогресс.')) {
+                localStorage.removeItem('keryverse_save');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
