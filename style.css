@@ -1,413 +1,311 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* Основные стили остаются как в предыдущей версии, добавляем новое */
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    color: #333;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1400px;
+/* ========== CHARACTER DRAWING ========== */
+.character-container {
+    position: relative;
+    width: 250px;
+    height: 350px;
     margin: 0 auto;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    overflow: hidden;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #ffafcc;
+.character {
+    position: relative;
+    width: 150px;
+    height: 300px;
+    margin: 0 auto;
 }
 
-h1 {
-    font-family: 'Dancing Script', cursive;
-    font-size: 3.5rem;
-    color: #ff5d8f;
-    margin-bottom: 10px;
+/* Лицо */
+.character-face {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 120px;
+    background: linear-gradient(135deg, #ffdbac, #f1c27d);
+    border-radius: 50% 50% 40% 40%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 10;
 }
 
-.subtitle {
-    font-size: 1.2rem;
-    color: #666;
+/* Волосы */
+.character-hair {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 80px;
+    background: linear-gradient(135deg, #8B4513, #A0522D);
+    border-radius: 60% 60% 40% 40%;
+    z-index: 5;
 }
 
-.game-area {
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    gap: 25px;
-    margin-bottom: 30px;
+.character-hair::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 10px;
+    width: 100px;
+    height: 40px;
+    background: inherit;
+    border-radius: 30% 30% 0 0;
 }
 
-@media (max-width: 1200px) {
-    .game-area {
-        grid-template-columns: 1fr;
-    }
+/* Глаза */
+.eyes {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
 }
 
-/* Панели */
-.stats-panel, .main-panel, .rewards-panel {
+.eye {
+    width: 20px;
+    height: 25px;
     background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
 }
 
-h2, h3 {
-    color: #ff5d8f;
-    margin-bottom: 20px;
+.eye::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    background: #2c3e50;
+    border-radius: 50%;
+    animation: blink 4s infinite;
+}
+
+/* Рот */
+.mouth {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 20px;
+    background: #ff6b81;
+    border-radius: 0 0 20px 20px;
+    transition: all 0.3s ease;
+}
+
+.mouth.happy {
+    height: 15px;
+    border-radius: 0 0 20px 20px;
+    background: #ff4757;
+}
+
+.mouth.sad {
+    height: 25px;
+    border-radius: 20px 20px 0 0;
+    background: #3742fa;
+    transform: translateX(-50%) rotate(180deg);
+}
+
+.mouth.neutral {
+    height: 5px;
+    width: 30px;
+    border-radius: 5px;
+    background: #ff6b81;
+}
+
+/* Платье */
+.character-dress {
+    position: absolute;
+    top: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 150px;
+    background: linear-gradient(135deg, #ff9ff3, #f368e0);
+    border-radius: 50% 50% 10% 10%;
+    z-index: 8;
+}
+
+/* Аксессуары */
+.character-accessories {
+    position: absolute;
+    z-index: 20;
+}
+
+.accessory {
+    position: absolute;
+    font-size: 24px;
+    animation: float 3s infinite ease-in-out;
+}
+
+/* ========== DAILY BONUS ========== */
+.daily-bonus {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
 }
 
-h2 i, h3 i {
-    color: #ffafcc;
-}
-
-/* Статистика */
-.stat-item {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.stat-label {
-    font-weight: 600;
-    color: #555;
-    display: inline-block;
-    width: 120px;
-}
-
-.stat-value {
-    font-weight: 700;
-    color: #ff5d8f;
-    margin-right: 10px;
-}
-
-.level-bar, .health-bar, .mood-bar, .energy-bar {
-    height: 10px;
-    background-color: #eee;
-    border-radius: 5px;
-    margin-top: 5px;
-    overflow: hidden;
-}
-
-.level-fill {
-    background: linear-gradient(90deg, #ffafcc, #ff5d8f);
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.5s ease;
-}
-
-.health-fill {
-    background: linear-gradient(90deg, #90e0ef, #00b4d8);
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.5s ease;
-}
-
-.mood-fill {
-    background: linear-gradient(90deg, #ffd166, #ff9e00);
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.5s ease;
-}
-
-.energy-fill {
-    background: linear-gradient(90deg, #c8e7a1, #83c167);
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.5s ease;
-}
-
-.coin-icon {
-    color: #ffd166;
-    margin-left: 5px;
-}
-
-/* Кнопка Telegram */
-.telegram-box {
-    background: linear-gradient(135deg, #0088cc, #1e96e8);
+.bonus-btn {
+    background: linear-gradient(135deg, #ff9ff3, #f368e0);
     color: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 30px;
-}
-
-.telegram-box h3 {
-    color: white;
-}
-
-.tg-btn {
-    background: white;
-    color: #0088cc;
     border: none;
     padding: 12px 25px;
     border-radius: 30px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 10px;
     display: flex;
     align-items: center;
     gap: 10px;
     transition: all 0.3s;
 }
 
-.tg-btn:hover {
+.bonus-btn:hover:not(:disabled) {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(243, 104, 224, 0.3);
 }
 
-.small-text {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-top: 10px;
+.bonus-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-/* Персонаж */
-.character-area {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.character {
-    background: linear-gradient(135deg, #ffafcc, #ffcad4);
+#bonusTimer {
+    background: rgba(0,0,0,0.1);
+    padding: 8px 15px;
     border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 25px;
-    position: relative;
-    min-height: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-#carry-image {
-    max-width: 250px;
-    max-height: 250px;
-    transition: transform 0.3s;
-}
-
-.character:hover #carry-image {
-    transform: scale(1.05);
-}
-
-.character-mood {
-    background: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    display: inline-block;
-    margin-top: 15px;
-    font-weight: 600;
-    color: #ff5d8f;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Кнопки действий */
-.action-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-@media (max-width: 768px) {
-    .action-buttons {
-        grid-template-columns: 1fr;
-    }
-}
-
-.action-btn {
-    background: linear-gradient(135deg, #a2d2ff, #cdb4db);
-    color: white;
-    border: none;
-    padding: 15px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s;
-}
-
-.action-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Магазин */
-.shop {
-    margin-top: 30px;
-}
-
-.shop-items {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-.shop-item {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.shop-item:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
-}
-
-.price {
-    font-weight: 700;
-    color: #ff5d8f;
-}
-
-/* Награды */
-.reward-item {
-    background: white;
-    border: 2px solid #eee;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    transition: all 0.3s;
-}
-
-.reward-item.unlocked {
-    border-color: #ffafcc;
-    background: linear-gradient(135deg, #fff5f7, #fff0f3);
-}
-
-.reward-level {
-    font-weight: 700;
-    color: #ff5d8f;
-    margin-bottom: 5px;
-}
-
-.reward-name {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.reward-desc {
     font-size: 0.9rem;
-    color: #666;
 }
 
-.inventory {
-    margin-top: 30px;
-    padding-top: 20px;
+/* ========== TELEGRAM STATUS ========== */
+.tg-status {
+    margin: 15px 0;
+}
+
+.status-connected, .status-disconnected {
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.status-connected {
+    background: rgba(46, 204, 113, 0.2);
+    color: #27ae60;
+    border: 2px solid #27ae60;
+}
+
+.status-disconnected {
+    background: rgba(231, 76, 60, 0.2);
+    color: #c0392b;
+    border: 2px solid #c0392b;
+}
+
+.tg-features {
+    background: rgba(0, 136, 204, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.tg-features p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    font-size: 0.9rem;
+}
+
+/* ========== ACHIEVEMENTS ========== */
+.achievement-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.achievement {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+}
+
+.achievement.unlocked {
+    background: linear-gradient(135deg, #fff5f7, #fff0f3);
+    border: 2px solid #ffafcc;
+}
+
+.achievement-icon {
+    font-size: 1.2rem;
+}
+
+/* ========== QUICK ACTIONS ========== */
+.quick-actions {
+    margin-top: 20px;
+    padding-top: 15px;
     border-top: 2px solid #eee;
 }
 
-/* Лог событий */
-.log-panel {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    margin-bottom: 30px;
+.quick-actions h4 {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 1rem;
 }
 
-.log {
-    height: 200px;
-    overflow-y: auto;
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    font-family: monospace;
+.quick-btns {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
 }
 
-.log-entry {
-    padding: 8px 0;
-    border-bottom: 1px dashed #ddd;
-    color: #555;
+.quick-btn {
+    background: #e9ecef;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+    font-size: 0.8rem;
 }
 
-/* Футер */
-footer {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 2px solid #ffafcc;
+.quick-btn:hover {
+    background: #dee2e6;
+    transform: translateY(-2px);
+}
+
+/* ========== SHOP TABS ========== */
+.shop-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.3s;
     color: #666;
 }
 
-.footer-links a {
-    color: #ff5d8f;
-    text-decoration: none;
-    margin: 0 10px;
-}
-
-.footer-links a:hover {
-    text-decoration: underline;
-}
-
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 30px;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 600px;
-    position: relative;
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: #ff5d8f;
-}
-
-/* Анимации */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.pulse {
-    animation: pulse 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease;
-}
+.tab-btn.active {
+    background: #ff5d8f;
+    color
