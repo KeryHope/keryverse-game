@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carivers - Игра про девочку Кэри</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Заголовок -->
+        <header>
+            <h1><i class="fas fa-heart"></i> Carivers</h1>
+            <p class="subtitle">Заботься о Кэри, прокачивай уровень и получай эксклюзивные гиды!</p>
+        </header>
+
+        <!-- Основная игровая область -->
+        <div class="game-area">
+            <!-- Левая колонка: Статистика -->
+            <div class="stats-panel">
+                <h2><i class="fas fa-chart-line"></i> Статистика Кэри</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Уровень:</span>
+                        <span class="stat-value" id="level">1</span>
+                        <div class="level-bar">
+                            <div class="level-fill" id="level-fill" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Опыт:</span>
+                        <span class="stat-value" id="xp">0/100</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Здоровье:</span>
+                        <span class="stat-value" id="health">100</span>
+                        <div class="health-bar">
+                            <div class="health-fill" id="health-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Настроение:</span>
+                        <span class="stat-value" id="mood">80</span>
+                        <div class="mood-bar">
+                            <div class="mood-fill" id="mood-fill" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Энергия:</span>
+                        <span class="stat-value" id="energy">90</span>
+                        <div class="energy-bar">
+                            <div class="energy-fill" id="energy-fill" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Коины:</span>
+                        <span class="stat-value" id="coins">150</span>
+                        <i class="fas fa-coins coin-icon"></i>
+                    </div>
+                </div>
+
+                <div class="telegram-box">
+                    <h3><i class="fab fa-telegram"></i> Telegram Бот</h3>
+                    <p>Подключи бота для уведомлений и ежедневных подарков!</p>
+                    <button class="tg-btn" onclick="connectTelegram()">
+                        <i class="fab fa-telegram"></i> Подключить бота
+                    </button>
+                    <p class="small-text">Бот: @CariversGameBot</p>
+                </div>
+            </div>
+
+            <!-- Центральная колонка: Кэри и действия -->
+            <div class="main-panel">
+                <div class="character-area">
+                    <div class="character" id="carry-character">
+                        <img src="images/carry-default.png" alt="Кэри" id="carry-image">
+                        <div class="character-mood" id="character-mood">😊 Счастлива</div>
+                    </div>
+                    
+                    <div class="actions">
+                        <h3><i class="fas fa-play-circle"></i> Действия</h3>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="feed()">
+                                <i class="fas fa-utensils"></i> Покормить (-5 коинов)
+                            </button>
+                            <button class="action-btn" onclick="play()">
+                                <i class="fas fa-gamepad"></i> Поиграть (-3 энергии)
+                            </button>
+                            <button class="action-btn" onclick="sleep()">
+                                <i class="fas fa-bed"></i> Уложить спать
+                            </button>
+                            <button class="action-btn" onclick="study()">
+                                <i class="fas fa-book"></i> Учиться (-10 энергии, +15 XP)
+                            </button>
+                            <button class="action-btn" onclick="beauty()">
+                                <i class="fas fa-spa"></i> Уход за собой (-7 коинов)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Магазин -->
+                <div class="shop">
+                    <h3><i class="fas fa-shopping-bag"></i> Магазин красоты</h3>
+                    <div class="shop-items">
+                        <div class="shop-item" onclick="buyItem('лак', 20)">
+                            <i class="fas fa-paint-brush"></i>
+                            <span>Лак для ногтей</span>
+                            <span class="price">20 коинов</span>
+                        </div>
+                        <div class="shop-item" onclick="buyItem('помада', 35)">
+                            <i class="fas fa-kiss-wink-heart"></i>
+                            <span>Блеск для губ</span>
+                            <span class="price">35 коинов</span>
+                        </div>
+                        <div class="shop-item" onclick="buyItem('платье', 80)">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Новое платье</span>
+                            <span class="price">80 коинов</span>
+                        </div>
+                        <div class="shop-item" onclick="buyItem('духи', 60)">
+                            <i class="fas fa-wind"></i>
+                            <span>Ароматные духи</span>
+                            <span class="price">60 коинов</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка: Награды и достижения -->
+            <div class="rewards-panel">
+                <h2><i class="fas fa-gift"></i> Награды за уровень</h2>
+                <div class="rewards-list">
+                    <div class="reward-item unlocked">
+                        <div class="reward-level">Уровень 1</div>
+                        <div class="reward-name">Стартовый набор</div>
+                        <div class="reward-desc">50 коинов + базовый уход</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-level">Уровень 3</div>
+                        <div class="reward-name">Гайд "Уход за кожей"</div>
+                        <div class="reward-desc">Эксклюзивный PDF гайд</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-level">Уровень 5</div>
+                        <div class="reward-name">Гайд "Макияж для начинающих"</div>
+                        <div class="reward-desc">Пошаговое видео + PDF</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-level">Уровень 8</div>
+                        <div class="reward-name">Гайд "Стиль и гардероб"</div>
+                        <div class="reward-desc">Полный курс по стилю</div>
+                    </div>
+                    <div class="reward-item">
+                        <div class="reward-level">Уровень 10</div>
+                        <div class="reward-name">VIP Гайд "Уверенность в себе"</div>
+                        <div class="reward-desc">Психология + практики</div>
+                    </div>
+                </div>
+
+                <div class="inventory">
+                    <h3><i class="fas fa-box-open"></i> Инвентарь</h3>
+                    <div id="inventory-items">
+                        <p>Пока пусто...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Логи событий -->
+        <div class="log-panel">
+            <h3><i class="fas fa-scroll"></i> Журнал событий</h3>
+            <div class="log" id="game-log">
+                <div class="log-entry">Добро пожаловать в Carivers! Позаботься о Кэри.</div>
+                <div class="log-entry">Подключи Telegram бота для получения ежедневных бонусов!</div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <footer>
+            <p>Carivers Game © 2023 | Игра-тамагочи с элементами beauty-гайдов</p>
+            <p class="footer-links">
+                <a href="#" onclick="showInstructions()">Как играть</a> | 
+                <a href="#" onclick="showAbout()">О проекте</a> | 
+                <a href="https://t.me/CariversGameBot" target="_blank">Telegram бот</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Модальное окно для инструкций -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Как играть в Carivers?</h2>
+            <ul>
+                <li><strong>Кормите Кэри</strong> - поддерживайте здоровье</li>
+                <li><strong>Играйте с ней</strong> - улучшайте настроение</li>
+                <li><strong>Давайте отдыхать</strong> - восстанавливайте энергию</li>
+                <li><strong>Учитесь вместе</strong> - получайте опыт для новых уровней</li>
+                <li><strong>Покупайте beauty-товары</strong> - улучшайте внешний вид</li>
+                <li><strong>Получайте награды</strong> - за уровни открываются эксклюзивные гайды</li>
+                <li><strong>Подключите Telegram бота</strong> - для уведомлений и бонусов</li>
+            </ul>
+            <p>Каждый день вы получаете 50 коинов за вход через Telegram бота!</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
